@@ -1,0 +1,41 @@
+version: '3'
+services:
+  nginx:
+   container_name: religram-nginx
+   image: nginx:1.13
+   ports:
+   - 80:80
+   - 443:443
+   volumes:
+   - ./nginx/conf.d:/etc/nginx/conf.d
+   depends_on:
+   - app
+ 
+  mysql:
+   container_name: religram-mysql
+   image: mysql:5.7
+   volumes:
+    - db_religram:/var/lib/mysql
+   environment:
+    MYSQL_DATABASE: religram
+    MYSQL_ROOT_PASSWORD: root
+    MYSQL_USER: religram
+    MYSQL_PASSWORD: religram
+   ports:
+    - "3306:3306"
+  
+  app:
+    container_name: religram-app
+    build: .
+    working_dir: /app
+    volumes:
+      - .:/app
+      - ~/.m2:/root/.m2
+    expose:
+      - "8080"
+    command: mvn clean spring-boot:run
+    depends_on:
+      - mysql
+
+volumes:
+  db_religram:
