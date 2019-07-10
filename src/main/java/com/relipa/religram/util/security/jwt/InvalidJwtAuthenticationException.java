@@ -1,4 +1,4 @@
-package com.relipa.religram.configuration.security.jwt;
+package com.relipa.religram.util.security.jwt;
 
 import org.springframework.security.core.AuthenticationException;
 

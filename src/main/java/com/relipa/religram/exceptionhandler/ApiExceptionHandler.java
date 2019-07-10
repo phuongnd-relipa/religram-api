@@ -44,4 +44,14 @@ public class ApiExceptionHandler {
         return new ErrorMessage(10002,errorMapList);
     }
 
+    /**
+     * UserAlreadyExistException sẽ được xử lý riêng tại đây
+     */
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(UserAlreadyExistException.class)
+    public ErrorMessage TodoException(Exception ex) {
+
+        return new ErrorMessage(10003,ex.getMessage());
+    }
+
 }

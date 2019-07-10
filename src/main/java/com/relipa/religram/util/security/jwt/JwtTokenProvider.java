@@ -1,4 +1,4 @@
-package com.relipa.religram.configuration.security.jwt;
+package com.relipa.religram.util.security.jwt;
 
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Autowired;

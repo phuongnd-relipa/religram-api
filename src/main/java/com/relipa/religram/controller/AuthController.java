@@ -1,12 +1,11 @@
 package com.relipa.religram.controller;
 
-import com.relipa.religram.configuration.security.jwt.JwtTokenProvider;
+import com.relipa.religram.util.security.jwt.JwtTokenProvider;
 import com.relipa.religram.controller.bean.request.UserSignupBean;
 import com.relipa.religram.controller.bean.response.UserInfoBean;
-import com.relipa.religram.entity.Post;
 import com.relipa.religram.entity.User;
-import com.relipa.religram.repository.PostRepository;
 import com.relipa.religram.repository.UserRepository;
+import com.relipa.religram.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,6 +41,9 @@ public class AuthController {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    UserService userService;
 
     @PostMapping("/login")
     public ResponseEntity signin(@RequestBody AuthenticationRequest data) {
@@ -69,15 +72,16 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity signup(@RequestBody UserSignupBean userBean) {
+    public ResponseEntity signup(@RequestBody @Valid UserSignupBean userBean) {
         User user = User.UserBuilder.builder()
                 .username(userBean.getUsername())
                 .password(this.passwordEncoder.encode(userBean.getPassword()))
-                .roles(Arrays.asList( "ROLE_USER"))
+                .roles(Arrays.asList("ROLE_USER"))
                 .email(userBean.getEmail())
                 .fullName(userBean.getFullname())
                 .build();
-        this.userRepository.save(user);
+
+        this.userService.registerNewUserAccount(user);
 
         String token = jwtTokenProvider.createToken(userBean.getUsername(), this.userRepository.findByUsername(userBean.getUsername()).orElseThrow(() -> new UsernameNotFoundException("Username " + userBean.getUsername() + "not found")).getRoles());
 

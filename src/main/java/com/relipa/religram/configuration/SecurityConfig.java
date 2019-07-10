@@ -1,7 +1,7 @@
 package com.relipa.religram.configuration;
 
-import com.relipa.religram.configuration.security.jwt.JwtConfigurer;
-import com.relipa.religram.configuration.security.jwt.JwtTokenProvider;
+import com.relipa.religram.util.security.jwt.JwtConfigurer;
+import com.relipa.religram.util.security.jwt.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
