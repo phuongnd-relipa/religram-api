@@ -1,9 +1,29 @@
 package com.relipa.religram.controller.bean.request;
 
+import com.relipa.religram.validator.ValidUserName;
+
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
 public class UserSignupBean {
+
+    @NotBlank(message = "{error.notBlank}")
+    @Size(max = 32, message = "error.maxlength}")
+    @ValidUserName(message = "{error.username.format}")
     private String username;
+
+    @NotBlank(message = "{error.notBlank}")
+    @Size(max = 32, message = "{error.maxlength}")
     private String password;
+
+    @NotBlank(message = "{error.notBlank}")
+    @Size(max = 32, message = "{error.maxlength}")
     private String fullname;
+
+    @NotBlank(message = "{error.notBlank}")
+    @Size(max = 32, message = "{error.maxlength}")
+    @Email(message = "{error.email}")
     private String email;
 
     public String getUsername() {

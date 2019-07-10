@@ -1,4 +1,4 @@
-package com.relipa.religram.configuration.security;
+package com.relipa.religram.util.security;
 
 import com.relipa.religram.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
