@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import static org.springframework.http.ResponseEntity.*;
@@ -81,7 +82,7 @@ public class AuthController {
                 .fullName(userBean.getFullname())
                 .build();
 
-        this.userService.registerNewUserAccount(user);
+        this.userService.registerNewUserAccount(user, Locale.ENGLISH);
 
         String token = jwtTokenProvider.createToken(userBean.getUsername(), this.userRepository.findByUsername(userBean.getUsername()).orElseThrow(() -> new UsernameNotFoundException("Username " + userBean.getUsername() + "not found")).getRoles());
 
