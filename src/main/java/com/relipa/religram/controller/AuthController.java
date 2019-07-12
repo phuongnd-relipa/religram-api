@@ -31,6 +31,8 @@ import static org.springframework.http.ResponseEntity.*;
 @RequestMapping("/auth")
 public class AuthController {
 
+    private static final String EMAIL_PATTERN = "^([_a-zA-Z0-9-]+(\\.[_a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)*(\\.[a-zA-Z]{2,6}))?$";
+
     @Autowired
     AuthenticationManager authenticationManager;
 
@@ -51,21 +53,13 @@ public class AuthController {
 
         try {
             String username = data.getUsername();
+
+            if (username.matches(EMAIL_PATTERN)) {
+                username = this.userRepository.findByEmail(username).orElseThrow(() -> new BadCredentialsException("Invalid username/password supplied")).getUsername();
+            }
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, data.getPassword()));
-            String token = jwtTokenProvider.createToken(username, this.userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Username " + username + "not found")).getRoles());
 
-            User user = this.userRepository.findByUsername(username).get();
-
-            UserInfoBean userInfoBean = new UserInfoBean();
-            userInfoBean.setUsername(user.getUsername());
-            userInfoBean.setFullname(user.getFullName());
-            userInfoBean.setEmail(user.getEmail());
-            userInfoBean.setAvatar(user.getAvatar());
-
-
-            Map<Object, Object> model = new HashMap<>();
-            model.put("user", userInfoBean);
-            model.put("token", token);
+            Map<Object, Object> model = this.getTokenAndUser(username);
             return ok(model);
         } catch (AuthenticationException e) {
             throw new BadCredentialsException("Invalid username/password supplied");
@@ -84,17 +78,25 @@ public class AuthController {
 
         this.userService.registerNewUserAccount(user, Locale.ENGLISH);
 
-        String token = jwtTokenProvider.createToken(userBean.getUsername(), this.userRepository.findByUsername(userBean.getUsername()).orElseThrow(() -> new UsernameNotFoundException("Username " + userBean.getUsername() + "not found")).getRoles());
+        Map<Object, Object> model = this.getTokenAndUser(userBean.getUsername());
+        return ok(model);
+    }
+
+    private Map<Object, Object> getTokenAndUser (String username) {
+
+        User user = this.userRepository.findByUsername(username).get();
+        String token = jwtTokenProvider.createToken(username, user.getRoles());
 
         UserInfoBean userInfoBean = new UserInfoBean();
-        userInfoBean.setUsername(userBean.getUsername());
-        userInfoBean.setFullname(userBean.getFullname());
-        userInfoBean.setEmail(userBean.getEmail());
-        userInfoBean.setAvatar("");
+        userInfoBean.setUsername(user.getUsername());
+        userInfoBean.setFullname(user.getFullName());
+        userInfoBean.setEmail(user.getEmail());
+        userInfoBean.setAvatar(user.getAvatar());
 
         Map<Object, Object> model = new HashMap<>();
         model.put("user", userInfoBean);
         model.put("token", token);
-        return ok(model);
+
+        return model;
     }
 }
