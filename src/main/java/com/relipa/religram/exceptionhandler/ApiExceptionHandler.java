@@ -3,6 +3,7 @@ package com.relipa.religram.exceptionhandler;
 import com.relipa.religram.error.ErrorMap;
 import com.relipa.religram.error.ErrorMessage;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -52,6 +53,12 @@ public class ApiExceptionHandler {
     public ErrorMessage TodoException(Exception ex) {
 
         return new ErrorMessage(10003,ex.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(BadCredentialsException.class)
+    public ErrorMessage handleUnauthrozieException(BadCredentialsException ex) {
+        return new ErrorMessage(10004, ex.getMessage());
     }
 
 }
