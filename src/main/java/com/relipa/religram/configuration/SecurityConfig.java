@@ -1,5 +1,6 @@
 package com.relipa.religram.configuration;
 
+import com.relipa.religram.exceptionhandler.RestAuthenticationEntryPoint;
 import com.relipa.religram.util.security.jwt.JwtConfigurer;
 import com.relipa.religram.util.security.jwt.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +38,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/auth/signup").permitAll()
                 .anyRequest().authenticated()
                 .and()
+                .exceptionHandling()
+                .authenticationEntryPoint(authenticationEntryPoint())
+                .and()
                 .apply(new JwtConfigurer(jwtTokenProvider));
         //@formatter:on
+    }
+
+    @Bean
+    RestAuthenticationEntryPoint authenticationEntryPoint() {
+        return new RestAuthenticationEntryPoint();
     }
 
 }

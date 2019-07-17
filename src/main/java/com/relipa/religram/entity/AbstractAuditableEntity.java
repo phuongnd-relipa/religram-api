@@ -34,4 +34,6 @@ public abstract class AbstractAuditableEntity<ID> extends AbstractPersistableEnt
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+
 }
