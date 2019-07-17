@@ -88,6 +88,7 @@ public class AuthController {
         String token = jwtTokenProvider.createToken(username, user.getRoles());
 
         UserInfoBean userInfoBean = new UserInfoBean();
+        userInfoBean.setId(user.getId());
         userInfoBean.setUsername(user.getUsername());
         userInfoBean.setFullname(user.getFullName());
         userInfoBean.setEmail(user.getEmail());
