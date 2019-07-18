@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @Service
 @Transactional
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl extends AbstractServiceImpl<User, Long> implements UserService {
 
     private final UserRepository userRepository;
 

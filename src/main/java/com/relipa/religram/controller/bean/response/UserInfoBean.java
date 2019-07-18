@@ -1,19 +1,12 @@
 package com.relipa.religram.controller.bean.response;
 
-public class UserInfoBean {
-    private Long id;
+import com.relipa.religram.controller.bean.AbstractBean;
+
+public class UserInfoBean extends AbstractBean {
     private String username;
     private String fullname;
     private String email;
     private String avatar;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getUsername() {
         return username;
