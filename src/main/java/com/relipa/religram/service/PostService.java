@@ -2,12 +2,13 @@ package com.relipa.religram.service;
 
 import com.relipa.religram.controller.bean.response.PostBean;
 import com.relipa.religram.entity.Post;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.List;
 
 public interface PostService extends AbstractService<Post,Long> {
 
-    List<PostBean> getAllPostByPage(Integer page);
+    List<PostBean> getAllPostByPage(Integer page, UserDetails userDetails);
 
     Integer getTotalPage();
 

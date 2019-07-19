@@ -1,11 +1,14 @@
 package com.relipa.religram.service;
 
+import com.relipa.religram.controller.bean.response.UserInfoBean;
 import com.relipa.religram.entity.User;
 import com.relipa.religram.exceptionhandler.UserAlreadyExistException;
 import com.relipa.religram.repository.UserRepository;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.core.env.Environment;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -24,6 +27,16 @@ public class UserServiceImpl extends AbstractServiceImpl<User, Long> implements 
     @Autowired
     public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    @Override
+    public UserInfoBean findUserByUserName(String userName) {
+        User user = userRepository.findByUsername(userName).orElseThrow(() -> new UsernameNotFoundException("An error occured!"));
+        UserInfoBean userInfoBean = new UserInfoBean();
+        BeanUtils.copyProperties(user, userInfoBean);
+        userInfoBean.setId(user.getId());
+
+        return userInfoBean;
     }
 
     @Override

@@ -13,6 +13,7 @@ public class PostBean extends AbstractBean {
     private Integer commentCount;
     private CommentBean [] comments;
     private PhotoBean [] photos;
+    private Boolean isLiked;
 
     public UserInfoBean getUser() {
         return user;
@@ -60,5 +61,13 @@ public class PostBean extends AbstractBean {
 
     public void setPhotos(PhotoBean[] photos) {
         this.photos = photos;
+    }
+
+    public Boolean getIsLiked() {
+        return isLiked;
+    }
+
+    public void setIsLiked(Boolean liked) {
+        isLiked = liked;
     }
 }

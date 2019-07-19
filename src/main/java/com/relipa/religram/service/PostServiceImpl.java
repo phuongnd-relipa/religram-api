@@ -1,5 +1,6 @@
 package com.relipa.religram.service;
 
+import com.relipa.religram.controller.bean.request.LikeBean;
 import com.relipa.religram.controller.bean.response.CommentBean;
 import com.relipa.religram.controller.bean.response.PhotoBean;
 import com.relipa.religram.controller.bean.response.PostBean;
@@ -11,6 +12,7 @@ import javassist.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,15 +38,20 @@ public class PostServiceImpl extends AbstractServiceImpl<Post, Long> implements 
     @Inject
     private PhotoService photoService;
 
+    @Inject
+    private LikeService likeService;
+
     @Override
     @Transactional(readOnly = true)
-    public List<PostBean> getAllPostByPage(Integer page) {
+    public List<PostBean> getAllPostByPage(Integer page, UserDetails userDetails) {
         List<Post> postList = postRepository.getPagePost(POST_PER_PAGE, (page - 1) * POST_PER_PAGE);
+        UserInfoBean currentUser = userService.findUserByUserName(userDetails.getUsername());
 
         List<PostBean> posts = new ArrayList<>();
         postList.forEach(post -> {
             PostBean postBean = new PostBean();
             BeanUtils.copyProperties(post, postBean);
+            postBean.setId(post.getId());
 
             User user = new User();
             try {
@@ -54,6 +61,7 @@ public class PostServiceImpl extends AbstractServiceImpl<Post, Long> implements 
             }
             UserInfoBean userInfoBean = new UserInfoBean();
             BeanUtils.copyProperties(user, userInfoBean);
+            userInfoBean.setId(user.getId());
             postBean.setUser(userInfoBean);
 
             List<CommentBean> comments =commentService.get3Comments(post.getId());
@@ -62,12 +70,16 @@ public class PostServiceImpl extends AbstractServiceImpl<Post, Long> implements 
             List<PhotoBean> photos = photoService.getPhotosByPostId(post.getId());
             postBean.setPhotos(photos.toArray(new PhotoBean[photos.size()]));
 
+            LikeBean like = likeService.getLikeByPostIdAndUserId(post.getId(), currentUser.getId());
+            postBean.setIsLiked((like == null) ? false : true);
+
             posts.add(postBean);
         });
         return posts;
     }
 
     @Override
+    @Transactional
     public Integer getTotalPage() {
         long totalPost = postRepository.count();
         return (int) totalPost / POST_PER_PAGE + 1;

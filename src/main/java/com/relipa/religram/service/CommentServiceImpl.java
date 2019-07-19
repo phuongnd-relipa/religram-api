@@ -49,10 +49,12 @@ public class CommentServiceImpl extends AbstractServiceImpl<Comment, Long> imple
         comments.forEach(comment -> {
             CommentBean commentBean = new CommentBean();
             BeanUtils.copyProperties(comment, commentBean);
+            commentBean.setId(comment.getId());
 
             User user = userRepository.findById(comment.getUserId()).orElseThrow(() -> new UsernameNotFoundException("An error occured!"));
             UserInfoBean userInfoBean = new UserInfoBean();
             BeanUtils.copyProperties(user, userInfoBean);
+            userInfoBean.setId(user.getId());
             commentBean.setUser(userInfoBean);
 
             commentBeans.add(commentBean);
@@ -67,12 +69,8 @@ public class CommentServiceImpl extends AbstractServiceImpl<Comment, Long> imple
         List<Comment> theLastsComment = commentRepository.getTheLastsCommentByPostId(postId, 2);
         Collections.reverse(theLastsComment);
 
-        theFirstComment.forEach(comment -> {
-            comments.add(comment);
-        });
-        theLastsComment.forEach(comment -> {
-            comments.add(comment);
-        });
+        theFirstComment.forEach(comment -> comments.add(comment));
+        theLastsComment.forEach(comment -> comments.add(comment));
 
         return comments;
     }

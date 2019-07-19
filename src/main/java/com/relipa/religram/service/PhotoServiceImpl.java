@@ -24,6 +24,7 @@ public class PhotoServiceImpl extends AbstractServiceImpl<Photo, Long> implement
         photoList.forEach(photo -> {
             PhotoBean photoBean = new PhotoBean();
             BeanUtils.copyProperties(photo, photoBean);
+            photoBean.setId(photo.getId());
 
             photos.add(photoBean);
         });
