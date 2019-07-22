@@ -38,5 +38,14 @@ services:
     depends_on:
       - mysql
 
+  react:
+    container_name: religram-react
+    build: ../religram-frontend
+    volumes:
+      - ../religram-frontend:/src/app
+    ports:
+      - "3000"
+    command: npm start
+
 volumes:
   db_religram:

@@ -20,7 +20,7 @@ import java.util.Map;
 import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
-@RequestMapping("/api/v1/post")
+@RequestMapping("/v1/post")
 public class PostController {
 
     @Autowired
