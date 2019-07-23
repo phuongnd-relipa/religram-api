@@ -1,5 +1,6 @@
 package com.relipa.religram.controller;
 
+import com.relipa.religram.controller.bean.request.CommentRequestBean;
 import com.relipa.religram.controller.bean.request.LikeBean;
 import com.relipa.religram.controller.bean.response.CommentBean;
 import com.relipa.religram.controller.bean.response.LikeStatusBean;
@@ -69,5 +70,12 @@ public class PostController {
         model.put("totalPage", totalPage);
 
         return ok(model);
+    }
+
+    @PostMapping("{postId}/comment")
+    public ResponseEntity postComment(@PathVariable Integer postId, @RequestBody CommentRequestBean commentRequest) {
+        CommentBean commentBean = commentService.postComment((long) postId, (long) commentRequest.getUserId(), commentRequest.getComment());
+
+        return ok(commentBean);
     }
 }

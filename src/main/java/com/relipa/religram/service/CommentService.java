@@ -12,4 +12,6 @@ public interface CommentService extends AbstractService<Comment,Long> {
     List<CommentBean> getCommentsByPostIdAndPageNumber(Long postId, Integer page);
 
     List<CommentBean> get3Comments(Long postId);
+
+    CommentBean postComment(Long postId, Long userId, String comment);
 }

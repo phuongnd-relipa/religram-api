@@ -15,7 +15,6 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CommentServiceImpl extends AbstractServiceImpl<Comment, Long> implements CommentService {
@@ -65,6 +64,21 @@ public class CommentServiceImpl extends AbstractServiceImpl<Comment, Long> imple
         return getCommentBeans(commentBeans, comments);
     }
 
+    @Override
+    @Transactional
+    public CommentBean postComment(Long postId, Long userId, String content) {
+        Comment comment = Comment.CommentBuilder.builder()
+                .postId(postId)
+                .userId(userId)
+                .comment(content)
+                .build();
+        comment = commentRepository.save(comment);
+        CommentBean commentBean = new CommentBean();
+        this.getCommentBean(commentBean, comment);
+
+        return commentBean;
+    }
+
     private List<Comment> get3CommentsForPostList(Long postId) {
         List<Comment> comments = new ArrayList<>();
         List<Comment> theFirstComment = commentRepository.getTheFirstsCommentByPostId(postId, 1);
@@ -80,18 +94,24 @@ public class CommentServiceImpl extends AbstractServiceImpl<Comment, Long> imple
     private List<CommentBean> getCommentBeans(List<CommentBean> commentBeans, List<Comment> comments) {
         comments.forEach(comment -> {
             CommentBean commentBean = new CommentBean();
-            BeanUtils.copyProperties(comment, commentBean);
-            commentBean.setId(comment.getId());
-
-            User user = userRepository.findById(comment.getUserId()).orElseThrow(() -> new UsernameNotFoundException("An error occured!"));
-            UserInfoBean userInfoBean = new UserInfoBean();
-            BeanUtils.copyProperties(user, userInfoBean);
-            userInfoBean.setId(user.getId());
-            commentBean.setUser(userInfoBean);
+            commentBean = this.getCommentBean(commentBean, comment);
 
             commentBeans.add(commentBean);
         });
 
         return commentBeans;
+    }
+
+    private CommentBean getCommentBean(CommentBean commentBean, Comment comment) {
+        BeanUtils.copyProperties(comment, commentBean);
+        commentBean.setId(comment.getId());
+
+        User user = userRepository.findById(comment.getUserId()).orElseThrow(() -> new UsernameNotFoundException("An error occured!"));
+        UserInfoBean userInfoBean = new UserInfoBean();
+        BeanUtils.copyProperties(user, userInfoBean);
+        userInfoBean.setId(user.getId());
+        commentBean.setUser(userInfoBean);
+
+        return commentBean;
     }
 }
