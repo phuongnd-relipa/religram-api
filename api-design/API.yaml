@@ -3,7 +3,7 @@ info:
   title: Religram API
   description: Tài liệu đặc tả API cho phía fontend.
   version: 1.0.0
-host: religram.relipasoft.com
+host: religram.relipa-test.online
 basePath: /api/v1
 tags:
   - name: auth
@@ -421,6 +421,17 @@ definitions:
       comment_count:
         type: integer
         format: binary
+      user:
+        $ref: '#/definitions/User'
+      comments:
+        type: array
+        xml:
+          name: comments
+          wrapped: true
+        items:
+          $ref: '#/definitions/Comment'
+      isLiked:
+        type: boolean
       created_at:
         type: string
       updated_at:
@@ -441,7 +452,11 @@ definitions:
       id:
         type: integer
         format: int64
-      photo_uri:
+      photoUri:
+        type: string
+      createdAt:
+        type: string
+      updatedAt:
         type: string
     xml:
       name: Photo
@@ -452,9 +467,13 @@ definitions:
       id:
         type: integer
         format: int64
+      user:
+        $ref: '#/definitions/User'
       comment:
         type: string
-      created_at:
+      createdAt:
+        type: string
+      updatedAt:
         type: string
     xml:
       name: Comment
