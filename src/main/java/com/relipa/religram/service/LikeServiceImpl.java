@@ -1,6 +1,7 @@
 package com.relipa.religram.service;
 
 import com.relipa.religram.controller.bean.request.LikeBean;
+import com.relipa.religram.controller.bean.response.LikeStatusBean;
 import com.relipa.religram.entity.Like;
 import com.relipa.religram.repository.LikeRepository;
 import org.springframework.beans.BeanUtils;
@@ -16,7 +17,7 @@ public class LikeServiceImpl extends AbstractServiceImpl<Like, Long> implements 
     private LikeRepository likeRepository;
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public LikeBean getLikeByPostIdAndUserId(Long postId, Long userId) {
         LikeBean likeBean = new LikeBean();
         Like like = likeRepository.getLikeByUserIdAndPostId(userId,postId);
@@ -27,5 +28,33 @@ public class LikeServiceImpl extends AbstractServiceImpl<Like, Long> implements 
         }
 
         return null;
+    }
+
+    @Override
+    @Transactional
+    public LikeStatusBean likePost(Long postId, Long userId) {
+        Like like = Like.LikeBuilder.builder()
+                        .postId(postId)
+                        .userId(userId)
+                        .build();
+        likeRepository.save(like);
+
+        LikeStatusBean likeStatusBean = new LikeStatusBean();
+        likeStatusBean.setIsLiked(true);
+        return likeStatusBean;
+    }
+
+    @Override
+
+    public LikeStatusBean unlikePost(LikeBean likeBean) {
+        Like like = new Like();
+        BeanUtils.copyProperties(like, likeBean);
+        like.setId(likeBean.getId());
+
+        likeRepository.delete(like);
+
+        LikeStatusBean likeStatusBean = new LikeStatusBean();
+        likeStatusBean.setIsLiked(false);
+        return likeStatusBean;
     }
 }
