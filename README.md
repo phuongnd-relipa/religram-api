@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="/.github/religramlogo2.png" alt="Religram Logo"/>
+    <img src="https://github.com/relipasoft/religram/raw/master/.github/religramlogo2.png" alt="Religram Logo"/>
 </p>
 
 <p align="center">Religram - Ideal Project for Relipa's Customers and Relipa's Employees</p>
