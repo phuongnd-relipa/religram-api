@@ -1,8 +1,10 @@
 package com.relipa.religram.controller;
 
 import com.relipa.religram.controller.bean.request.LikeBean;
+import com.relipa.religram.controller.bean.response.CommentBean;
 import com.relipa.religram.controller.bean.response.LikeStatusBean;
 import com.relipa.religram.controller.bean.response.PostBean;
+import com.relipa.religram.service.CommentService;
 import com.relipa.religram.service.LikeService;
 import com.relipa.religram.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,17 +29,14 @@ public class PostController {
     @Autowired
     LikeService likeService;
 
+    @Autowired
+    CommentService commentService;
+
     @GetMapping("")
     public ResponseEntity list(@RequestParam Integer page, @AuthenticationPrincipal UserDetails userDetails) {
 
         List<PostBean> postList = postService.getAllPostByPage(page, userDetails);
-        int totalPage = postService.getTotalPage();
-
-        Map<Object, Object> model = new HashMap<>();
-        model.put("posts", postList.toArray());
-        model.put("totalPage", totalPage);
-
-        return ok(model);
+        return getResponseEntity(postService.getTotalPage(), postList.toArray(), "posts");
     }
 
     @PostMapping("/{postId}/like")
@@ -54,5 +53,20 @@ public class PostController {
         }
 
         return ok(likeStatusBean);
+    }
+
+    @GetMapping("{postId}/comment")
+    public ResponseEntity comment(@PathVariable Integer postId, @RequestParam Integer page) {
+        List<CommentBean> commentBeans = commentService.getCommentsByPostIdAndPageNumber((long) postId, page);
+        return getResponseEntity(commentService.getTotalPage((long) postId), commentBeans.toArray(), "comments");
+    }
+
+    private ResponseEntity getResponseEntity(Integer totalPage, Object[] objects, String listObjName) {
+
+        Map<Object, Object> model = new HashMap<>();
+        model.put(listObjName, objects);
+        model.put("totalPage", totalPage);
+
+        return ok(model);
     }
 }

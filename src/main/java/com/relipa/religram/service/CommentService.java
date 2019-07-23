@@ -7,7 +7,9 @@ import java.util.List;
 
 public interface CommentService extends AbstractService<Comment,Long> {
 
-    List<CommentBean> getCommentsByPostIdAndPageNumber(Long postId, Integer limit, Integer offset);
+    Integer getTotalPage(Long postId);
+
+    List<CommentBean> getCommentsByPostIdAndPageNumber(Long postId, Integer page);
 
     List<CommentBean> get3Comments(Long postId);
 }

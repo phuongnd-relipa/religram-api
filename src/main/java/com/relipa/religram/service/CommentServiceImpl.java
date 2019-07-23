@@ -20,6 +20,8 @@ import java.util.Optional;
 @Service
 public class CommentServiceImpl extends AbstractServiceImpl<Comment, Long> implements CommentService {
 
+    private static final int COMMENT_PER_PAGE = 10;
+
     @Inject
     private CommentRepository commentRepository;
 
@@ -27,12 +29,26 @@ public class CommentServiceImpl extends AbstractServiceImpl<Comment, Long> imple
     private UserRepository userRepository;
 
     @Override
-    public List<CommentBean> getCommentsByPostIdAndPageNumber(Long postId, Integer limit, Integer offset) {
-        return null;
+    @Transactional(readOnly = true)
+    public List<CommentBean> getCommentsByPostIdAndPageNumber(Long postId, Integer page) {
+        List<CommentBean> commentBeans = new ArrayList<>();
+        List<Comment> comments;
+
+        comments = commentRepository.getCommentsByPostIdAndPageNumber(postId, COMMENT_PER_PAGE, (page - 1) * COMMENT_PER_PAGE);
+        return getCommentBeans(commentBeans, comments);
     }
+
 
     @Override
     @Transactional
+    public Integer getTotalPage(Long postId) {
+        long totalPost = commentRepository.countCommentsByPostId(postId);
+        return (int) totalPost / COMMENT_PER_PAGE + 1;
+
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<CommentBean> get3Comments(Long postId) {
 
         List<CommentBean> commentBeans = new ArrayList<>();
@@ -46,6 +62,22 @@ public class CommentServiceImpl extends AbstractServiceImpl<Comment, Long> imple
             comments = this.get3CommentsForPostList(postId);
         }
 
+        return getCommentBeans(commentBeans, comments);
+    }
+
+    private List<Comment> get3CommentsForPostList(Long postId) {
+        List<Comment> comments = new ArrayList<>();
+        List<Comment> theFirstComment = commentRepository.getTheFirstsCommentByPostId(postId, 1);
+        List<Comment> theLastsComment = commentRepository.getTheLastsCommentByPostId(postId, 2);
+        Collections.reverse(theLastsComment);
+
+        theFirstComment.forEach(comment -> comments.add(comment));
+        theLastsComment.forEach(comment -> comments.add(comment));
+
+        return comments;
+    }
+
+    private List<CommentBean> getCommentBeans(List<CommentBean> commentBeans, List<Comment> comments) {
         comments.forEach(comment -> {
             CommentBean commentBean = new CommentBean();
             BeanUtils.copyProperties(comment, commentBean);
@@ -62,17 +94,4 @@ public class CommentServiceImpl extends AbstractServiceImpl<Comment, Long> imple
 
         return commentBeans;
     }
-
-    private List<Comment> get3CommentsForPostList(Long postId) {
-        List<Comment> comments = new ArrayList<>();
-        List<Comment> theFirstComment = commentRepository.getTheFirstsCommentByPostId(postId, 1);
-        List<Comment> theLastsComment = commentRepository.getTheLastsCommentByPostId(postId, 2);
-        Collections.reverse(theLastsComment);
-
-        theFirstComment.forEach(comment -> comments.add(comment));
-        theLastsComment.forEach(comment -> comments.add(comment));
-
-        return comments;
-    }
-
 }
