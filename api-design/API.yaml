@@ -22,11 +22,22 @@ paths:
       summary: Login
       description: Nhập username (email) và password để login vào ứng dụng
       operationId: 'login'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          description: Thông tin đăng nhập gồm user (email) và password
+          schema:
+            $ref: '#/definitions/LoginRequest'
       produces:
         - application/json
       responses:
         200:
           description: Successful operation
+          schema:
+            $ref: '#/definitions/LoginResponse'
+        401:
+          description: Unauthorized. Username/password incorrected.
 
   /auth/signup:
     post:
@@ -34,10 +45,23 @@ paths:
         - auth
       summary: Signup new user
       description: Nhập các thông tin user để đăng ký tài khoản mới
+      parameters:
+        - name: body
+          in: body
+          required: true
+          description: Thông tin đăng ký tài khoản
+          schema:
+            $ref: '#/definitions/SignupRequest'
       operationId: 'signup'
       responses:
         200:
           description: Successful operation
+          schema:
+            $ref: '#/definitions/LoginResponse'
+        400:
+          description: Validation failed.
+        409:
+          description: User existed.
 
   /auth/verify/{token}:
     get:
@@ -117,7 +141,8 @@ paths:
         - name: page
           in: query
           description: Phân trang
-          required: false
+          default: 1
+          required: true
           type: integer
           format: int32
       produces:
@@ -129,12 +154,8 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Post'
-        400:
-          description: Invalid
         401:
           $ref: '#/responses/UnauthorizedError'
-        404:
-          description: Not found
         default:
           description: Unexpected error
       security:
@@ -197,38 +218,6 @@ paths:
       security:
         - religram_auth: []
 
-  /post/{id}/image:
-    post:
-      tags:
-        - post
-      summary: Upload Images
-      description: Dùng upload images khi đăng bài post
-      operationId: 'uploadImages'
-      produces:
-        - application/json
-      consumes:
-        - multipart/form-data
-      parameters:
-        - name: id
-          in: path
-          description: Id của bài post
-          required: true
-          type: integer
-          format: string
-        - name: image
-          in: formData
-          type: file
-          description: Ảnh upload lên server
-      responses:
-        200:
-          description: Successful operation
-        401:
-          $ref: '#/responses/UnauthorizedError'
-        default:
-          description: Error
-      security:
-        - religram_auth: []
-
   /post/{id}/comment:
     get:
       tags:
@@ -248,7 +237,7 @@ paths:
         - name: page
           in: query
           description: Phân trang
-          required: false
+          required: true
           type: integer
       responses:
         200:
@@ -259,6 +248,8 @@ paths:
               $ref: '#/definitions/Comment'
         401:
           $ref: '#/responses/UnauthorizedError'
+        default:
+          description: Unexpected error
       security:
         - religram_auth: []
 
@@ -284,11 +275,13 @@ paths:
           description: Id của user đang login
           required: true
           schema:
-            $ref: '#/definitions/CommentBody'
+            $ref: '#/definitions/CommentRequest'
 
       responses:
         200:
           description: Successful operation
+          schema:
+            $ref: '#/definitions/Comment'
         401:
           $ref: '#/responses/UnauthorizedError'
       security:
@@ -318,8 +311,12 @@ paths:
       responses:
         200:
           description: Successful operation
+          schema:
+            $ref: '#/definitions/LikeResponse'
         401:
           $ref: '#/responses/UnauthorizedError'
+        default:
+          description: Unexpected error
       security:
         - religram_auth: []
 
@@ -415,10 +412,10 @@ definitions:
         format: int64
       content:
         type: string
-      like_count:
+      likeCount:
         type: integer
         format: int32
-      comment_count:
+      commentCount:
         type: integer
         format: binary
       user:
@@ -478,7 +475,7 @@ definitions:
     xml:
       name: Comment
 
-  CommentBody:
+  CommentRequest:
     type: object
     properties:
       userId:
@@ -488,5 +485,50 @@ definitions:
         type: string
     xml:
       name: CommentBody
+
+  LikeResponse:
+    type: object
+    properties:
+      isLiked:
+        type: boolean
+      likeCount:
+        type: integer
+        format: int64
+    xml:
+      name: LikeResponse
+
+  LoginRequest:
+    type: object
+    properties:
+      username:
+        type: string
+      password:
+        type: string
+    xml:
+      name: LoginRequest
+
+  SignupRequest:
+    type: object
+    properties:
+      username:
+        type: string
+      password:
+        type: string
+      fullname:
+        type: string
+      email:
+        type: string
+    xml:
+      name: SignupRequest
+
+  LoginResponse:
+    type: object
+    properties:
+      user:
+        $ref: '#/definitions/User'
+      token:
+        type: string
+    xml:
+      name: LoginResponse
 
 
