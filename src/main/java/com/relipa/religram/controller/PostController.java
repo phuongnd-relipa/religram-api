@@ -47,6 +47,7 @@ public class PostController {
 
         if (like != null) {
             likeBean.setId(like.getId());
+            likeBean.setPostId((long) postId);
             likeStatusBean = likeService.unlikePost(likeBean);
         } else {
             likeStatusBean = likeService.likePost((long) postId, likeBean.getUserId());
