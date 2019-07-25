@@ -3,8 +3,10 @@ package com.relipa.religram.service;
 import com.relipa.religram.controller.bean.response.CommentBean;
 import com.relipa.religram.controller.bean.response.UserInfoBean;
 import com.relipa.religram.entity.Comment;
+import com.relipa.religram.entity.Post;
 import com.relipa.religram.entity.User;
 import com.relipa.religram.repository.CommentRepository;
+import com.relipa.religram.repository.PostRepository;
 import com.relipa.religram.repository.UserRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,6 +29,9 @@ public class CommentServiceImpl extends AbstractServiceImpl<Comment, Long> imple
 
     @Inject
     private UserRepository userRepository;
+
+    @Inject
+    private PostRepository postRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -73,6 +79,13 @@ public class CommentServiceImpl extends AbstractServiceImpl<Comment, Long> imple
                 .comment(content)
                 .build();
         comment = commentRepository.save(comment);
+
+        // Update comment count of Post
+        Post post = postRepository.findById(postId).orElseThrow(() -> new EntityNotFoundException("Not found th Post"));
+        if (post != null) {
+            post.setCommentCount(post.getCommentCount() + 1);
+        }
+
         CommentBean commentBean = new CommentBean();
         this.getCommentBean(commentBean, comment);
 
@@ -85,8 +98,8 @@ public class CommentServiceImpl extends AbstractServiceImpl<Comment, Long> imple
         List<Comment> theLastsComment = commentRepository.getTheLastsCommentByPostId(postId, 2);
         Collections.reverse(theLastsComment);
 
-        theFirstComment.forEach(comment -> comments.add(comment));
-        theLastsComment.forEach(comment -> comments.add(comment));
+        comments.addAll(theFirstComment);
+        comments.addAll(theLastsComment);
 
         return comments;
     }
