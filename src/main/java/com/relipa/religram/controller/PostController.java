@@ -2,6 +2,7 @@ package com.relipa.religram.controller;
 
 import com.relipa.religram.controller.bean.request.CommentRequestBean;
 import com.relipa.religram.controller.bean.request.LikeBean;
+import com.relipa.religram.controller.bean.request.PostRequestBean;
 import com.relipa.religram.controller.bean.response.CommentBean;
 import com.relipa.religram.controller.bean.response.LikeStatusBean;
 import com.relipa.religram.controller.bean.response.PostBean;
@@ -14,6 +15,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +41,12 @@ public class PostController {
 
         List<PostBean> postList = postService.getAllPostByPage(page, userDetails);
         return getResponseEntity(postService.getTotalPage(), postList.toArray(), "posts");
+    }
+
+    @PostMapping("")
+    public ResponseEntity post(@RequestBody @Valid PostRequestBean postRequestBean) {
+
+        return ok("");
     }
 
     @PostMapping("/{postId}/like")

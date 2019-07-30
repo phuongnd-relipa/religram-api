@@ -5,11 +5,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name="posts")
@@ -22,7 +22,7 @@ public class Post extends AbstractAuditableEntity<Long> implements Serializable 
     @Column(name = "user_id", nullable = false)
     private Integer userId;
 
-    @Column
+    @Column(length = 3000)
     private String content;
 
     @Column(name = "like_count")
@@ -30,6 +30,10 @@ public class Post extends AbstractAuditableEntity<Long> implements Serializable 
 
     @Column(name = "comment_count")
     private Integer commentCount;
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "hashtag_post", joinColumns = @JoinColumn(name = "post_id"), inverseJoinColumns = @JoinColumn(name = "hashtag_id"))
+    private Set<Hashtag> hashtags = new HashSet<>();
 
     public Integer getUserId() {
         return userId;
@@ -63,6 +67,13 @@ public class Post extends AbstractAuditableEntity<Long> implements Serializable 
         this.commentCount = commentCount;
     }
 
+    public Set<Hashtag> getHashtags() {
+        return hashtags;
+    }
+
+    public void setHashtags(Set<Hashtag> hashtags) {
+        this.hashtags = hashtags;
+    }
 
     public static final class PostBuilder {
         private Post post;
