@@ -1,10 +1,10 @@
 package com.relipa.religram.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name="comments")
@@ -16,8 +16,12 @@ public class Comment extends AbstractAuditableEntity<Long> implements Serializab
     @Column(name = "post_id")
     private Long postId;
 
-    @Column
+    @Column(length = 3000)
     private String comment;
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "hashtag_comment", joinColumns = @JoinColumn(name = "comment_id"), inverseJoinColumns = @JoinColumn(name = "hashtag_id"))
+    private Set<Hashtag> hashtags = new HashSet<>();
 
     public Long getUserId() {
         return userId;
@@ -43,6 +47,13 @@ public class Comment extends AbstractAuditableEntity<Long> implements Serializab
         this.comment = comment;
     }
 
+    public Set<Hashtag> getHashtags() {
+        return hashtags;
+    }
+
+    public void setHashtags(Set<Hashtag> hashtags) {
+        this.hashtags = hashtags;
+    }
 
     public static final class CommentBuilder {
         LocalDateTime createdAt;

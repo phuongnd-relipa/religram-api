@@ -9,6 +9,7 @@ services:
    volumes:
    - ./nginx/conf.d:/etc/nginx/conf.d
    - ./api-design:/var/www/html/api-doc
+   - ./photos:/var/www/html/photos
    depends_on:
    - app
  

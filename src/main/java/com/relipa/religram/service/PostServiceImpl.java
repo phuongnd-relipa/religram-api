@@ -1,6 +1,7 @@
 package com.relipa.religram.service;
 
 import com.relipa.religram.controller.bean.request.LikeBean;
+import com.relipa.religram.controller.bean.request.PostRequestBean;
 import com.relipa.religram.controller.bean.response.CommentBean;
 import com.relipa.religram.controller.bean.response.PhotoBean;
 import com.relipa.religram.controller.bean.response.PostBean;
@@ -8,6 +9,7 @@ import com.relipa.religram.controller.bean.response.UserInfoBean;
 import com.relipa.religram.entity.Post;
 import com.relipa.religram.entity.User;
 import com.relipa.religram.repository.PostRepository;
+import com.relipa.religram.util.ImageUtils;
 import javassist.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +42,8 @@ public class PostServiceImpl extends AbstractServiceImpl<Post, Long> implements 
 
     @Inject
     private LikeService likeService;
+
+    @Inject HashtagService hashtagService;
 
     @Override
     @Transactional(readOnly = true)
@@ -79,10 +83,32 @@ public class PostServiceImpl extends AbstractServiceImpl<Post, Long> implements 
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public Integer getTotalPage() {
         long totalPost = postRepository.count();
         return (int) totalPost / POST_PER_PAGE + 1;
 
+    }
+
+    @Override
+    @Transactional
+    public boolean createPost(PostRequestBean postRequestBean) {
+
+        // Save image
+        String fileOutput = ImageUtils.getImageFileName(postRequestBean.getImage());
+        ImageUtils.decodeToImage(postRequestBean.getImage(), fileOutput);
+        // TODO: coding insert new post + image hashtags
+
+        List<String> hashtags = postRequestBean.getHashtags();
+        hashtags.forEach(hashtag -> {
+            if (hashtagService.existHashTagByName(hashtag)) {
+                // TODO get ID and insert into hashtag_post
+            } else {
+                // TODO save hashtag and get ID to insert into hashtag_post
+            }
+        });
+
+
+        return true;
     }
 }

@@ -17,7 +17,7 @@ public interface CommentRepository extends CrudRepository<Comment, Long> {
     @Query(value = "select * from comments where post_id = :post_id order by created_at asc limit :limit", nativeQuery = true)
     List<Comment> getTheLastsCommentByPostId(@Param("post_id") Long postId, @Param("limit") Integer limit);
 
-    @Query(value = "select * from comments where post_id = :post_id order by created_at limit :limit offset :offset", nativeQuery = true)
+    @Query(value = "select * from comments where post_id = :post_id order by created_at desc limit :limit offset :offset", nativeQuery = true)
     List<Comment> getCommentsByPostIdAndPageNumber(@Param("post_id") Long postId, @Param("limit") Integer limit, @Param("offset") Integer offset);
 
     @Query(value = "select count(*) from comments where post_id = :post_id", nativeQuery = true)
