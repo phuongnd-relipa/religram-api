@@ -320,7 +320,7 @@ paths:
     get:
       tags:
         - user
-      summary: Get current user info
+      summary: Get user info by
       description: Sử dụng lấy info trong màn hình profile
       operationId: 'getUserById'
       produces:
@@ -338,13 +338,16 @@ paths:
             $ref: '#/definitions/User'
         401:
           $ref: '#/responses/UnauthorizedError'
+        default:
+          description: Unexpected error
       security:
         - religram_auth: []
 
+  /user:
     put:
       tags:
         - user
-      summary: Update User info
+      summary: Update current User info
       description: Dungf update thông tin user
       operationId: 'updateUserInfo'
       produces:
@@ -352,12 +355,8 @@ paths:
       consumes:
         - application/json
       parameters:
-        - name: id
-          in: path
-          required: true
-          type: integer
-          format: int64
         - name: body
+          description: Trường avatar gửi lên base64 của avatar
           in: body
           schema:
             $ref: '#/definitions/User'
@@ -366,6 +365,37 @@ paths:
           description: Successful operation
         401:
           $ref: '#/responses/UnauthorizedError'
+        default:
+          description: Unexpected error
+      security:
+        - religram_auth: []
+
+  /user/{id}/posts:
+    get:
+      tags:
+        - user
+      summary: Get post of user
+      description: Sử dụng lấy tất cả các bài post của 1 user
+      operationId: 'getPostsByUserId'
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: Successful operation
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Post'
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        default:
+          description: Unexpected error
       security:
         - religram_auth: []
 
