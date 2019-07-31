@@ -1,9 +1,12 @@
 package com.relipa.religram.controller.bean.request;
 
+import java.util.List;
+
 public class CommentRequestBean {
 
     private Integer userId;
     private String comment;
+    private List<String> hashtags;
 
     public Integer getUserId() {
         return userId;
@@ -19,5 +22,13 @@ public class CommentRequestBean {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public List<String> getHashtags() {
+        return hashtags;
+    }
+
+    public void setHashtags(List<String> hashtags) {
+        this.hashtags = hashtags;
     }
 }

@@ -1,8 +1,10 @@
 package com.relipa.religram.service;
 
+import com.relipa.religram.controller.bean.request.CommentRequestBean;
 import com.relipa.religram.controller.bean.response.CommentBean;
 import com.relipa.religram.controller.bean.response.UserInfoBean;
 import com.relipa.religram.entity.Comment;
+import com.relipa.religram.entity.Hashtag;
 import com.relipa.religram.entity.Post;
 import com.relipa.religram.entity.User;
 import com.relipa.religram.repository.CommentRepository;
@@ -15,9 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class CommentServiceImpl extends AbstractServiceImpl<Comment, Long> implements CommentService {
@@ -32,6 +32,8 @@ public class CommentServiceImpl extends AbstractServiceImpl<Comment, Long> imple
 
     @Inject
     private PostRepository postRepository;
+
+    @Inject HashtagService hashtagService;
 
     @Override
     @Transactional(readOnly = true)
@@ -72,12 +74,16 @@ public class CommentServiceImpl extends AbstractServiceImpl<Comment, Long> imple
 
     @Override
     @Transactional
-    public CommentBean postComment(Long postId, Long userId, String content) {
+    public CommentBean postComment(Long postId, CommentRequestBean commentRequestBean) {
+
+        Set<Hashtag> hashtagSet = insertHashtags(commentRequestBean.getHashtags());
+
         Comment comment = Comment.CommentBuilder.builder()
                 .postId(postId)
-                .userId(userId)
-                .comment(content)
+                .userId((long) commentRequestBean.getUserId())
+                .comment(commentRequestBean.getComment())
                 .build();
+        comment.setHashtags(hashtagSet);
         comment = commentRepository.save(comment);
 
         // Update comment count of Post
@@ -90,6 +96,28 @@ public class CommentServiceImpl extends AbstractServiceImpl<Comment, Long> imple
         this.getCommentBean(commentBean, comment);
 
         return commentBean;
+    }
+
+    @Override
+    @Transactional
+    public Set<Hashtag> insertHashtags(List<String> hashtagNames) {
+
+        Set<Hashtag> hashtagSet = new HashSet<>();
+        hashtagNames.forEach(hashtagName -> {
+            if (hashtagService.existHashTagByName(hashtagName)) {
+                Hashtag tag = hashtagService.findByHashtag(hashtagName);
+                hashtagSet.add(tag);
+
+            } else {
+                Hashtag tag = new Hashtag();
+                tag.setHashtag(hashtagName);
+
+                hashtagService.save(tag);
+                hashtagSet.add(tag);
+            }
+        });
+
+        return hashtagSet;
     }
 
     private List<Comment> get3CommentsForPostList(Long postId) {

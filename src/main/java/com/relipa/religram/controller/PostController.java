@@ -88,7 +88,7 @@ public class PostController {
 
     @PostMapping("{postId}/comment")
     public ResponseEntity postComment(@PathVariable Integer postId, @RequestBody CommentRequestBean commentRequest) {
-        CommentBean commentBean = commentService.postComment((long) postId, (long) commentRequest.getUserId(), commentRequest.getComment());
+        CommentBean commentBean = commentService.postComment((long) postId, commentRequest);
 
         return ok(commentBean);
     }
