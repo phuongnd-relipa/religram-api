@@ -11,5 +11,7 @@ public interface UserService extends AbstractService<User, Long> {
 
     UserInfoBean findUserByUserName(String userName);
 
+    UserInfoBean findUserById(Long userId);
+
     void registerNewUserAccount(User user, Locale locale) throws UserAlreadyExistException;
 }

@@ -11,6 +11,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.util.Locale;
 import java.util.Optional;
@@ -32,6 +33,17 @@ public class UserServiceImpl extends AbstractServiceImpl<User, Long> implements 
     @Override
     public UserInfoBean findUserByUserName(String userName) {
         User user = userRepository.findByUsername(userName).orElseThrow(() -> new UsernameNotFoundException("An error occured!"));
+        UserInfoBean userInfoBean = new UserInfoBean();
+        BeanUtils.copyProperties(user, userInfoBean);
+        userInfoBean.setId(user.getId());
+
+        return userInfoBean;
+    }
+
+    @Override
+    public UserInfoBean findUserById(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("Not found user"));
+
         UserInfoBean userInfoBean = new UserInfoBean();
         BeanUtils.copyProperties(user, userInfoBean);
         userInfoBean.setId(user.getId());
