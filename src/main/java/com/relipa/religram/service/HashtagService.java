@@ -9,4 +9,6 @@ import com.relipa.religram.entity.Hashtag;
 public interface HashtagService extends AbstractService<Hashtag, Long> {
 
     Boolean existHashTagByName(String hashtag);
+
+    Hashtag findByHashtag(String hashtag);
 }

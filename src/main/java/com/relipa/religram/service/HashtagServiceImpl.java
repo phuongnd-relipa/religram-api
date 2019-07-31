@@ -9,6 +9,7 @@ import com.relipa.religram.repository.HashtagRepository;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import javax.persistence.EntityNotFoundException;
 
 @Service
 public class HashtagServiceImpl extends AbstractServiceImpl<Hashtag, Long> implements HashtagService {
@@ -19,5 +20,12 @@ public class HashtagServiceImpl extends AbstractServiceImpl<Hashtag, Long> imple
     @Override
     public Boolean existHashTagByName(String hashtag) {
         return hashtagRepository.existsHashtagByHashtag(hashtag);
+    }
+
+    @Override
+    public Hashtag findByHashtag(String hashtag) {
+
+        Hashtag tag = hashtagRepository.findByHashtag(hashtag).orElseThrow(() -> new EntityNotFoundException("Not found hashtag"));
+        return tag;
     }
 }
