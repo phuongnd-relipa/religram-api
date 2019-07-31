@@ -4,6 +4,7 @@
 
 package com.relipa.religram.util;
 
+import com.relipa.religram.constant.Constant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +45,7 @@ public class ImageUtils {
 
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
-        return timestamp.getTime() + "." + getImageExtension(imageString);
+        return Constant.PHOTOS_BASE_PATH + "/" + timestamp.getTime() + "." + getImageExtension(imageString);
     }
 
     private static String getImageExtension(String imageString) {

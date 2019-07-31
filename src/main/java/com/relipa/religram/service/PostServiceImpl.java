@@ -6,6 +6,8 @@ import com.relipa.religram.controller.bean.response.CommentBean;
 import com.relipa.religram.controller.bean.response.PhotoBean;
 import com.relipa.religram.controller.bean.response.PostBean;
 import com.relipa.religram.controller.bean.response.UserInfoBean;
+import com.relipa.religram.entity.Hashtag;
+import com.relipa.religram.entity.Photo;
 import com.relipa.religram.entity.Post;
 import com.relipa.religram.entity.User;
 import com.relipa.religram.repository.PostRepository;
@@ -20,7 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class PostServiceImpl extends AbstractServiceImpl<Post, Long> implements PostService {
@@ -94,20 +98,41 @@ public class PostServiceImpl extends AbstractServiceImpl<Post, Long> implements 
     @Transactional
     public boolean createPost(PostRequestBean postRequestBean) {
 
-        // Save image
-        String fileOutput = ImageUtils.getImageFileName(postRequestBean.getImage());
-        ImageUtils.decodeToImage(postRequestBean.getImage(), fileOutput);
-        // TODO: coding insert new post + image hashtags
+        Post post = new Post();
 
-        List<String> hashtags = postRequestBean.getHashtags();
-        hashtags.forEach(hashtag -> {
-            if (hashtagService.existHashTagByName(hashtag)) {
-                // TODO get ID and insert into hashtag_post
+        post.setContent(postRequestBean.getCaption());
+        post.setCommentCount(0);
+        post.setLikeCount(0);
+        post.setUserId(postRequestBean.getUserId());
+
+        List<String> hashtagNames = postRequestBean.getHashtags();
+
+        Set<Hashtag> hashtagSet = new HashSet<>();
+        hashtagNames.forEach(hashtagName -> {
+            if (hashtagService.existHashTagByName(hashtagName)) {
+                Hashtag tag = hashtagService.findByHashtag(hashtagName);
+                hashtagSet.add(tag);
+
             } else {
-                // TODO save hashtag and get ID to insert into hashtag_post
+                Hashtag tag = new Hashtag();
+                tag.setHashtag(hashtagName);
+
+                hashtagService.save(tag);
+                hashtagSet.add(tag);
             }
         });
 
+        post.setHashtags(hashtagSet);
+        postRepository.save(post);
+
+        // Save image
+        String fileOutput = ImageUtils.getImageFileName(postRequestBean.getImage());
+        ImageUtils.decodeToImage(postRequestBean.getImage(), fileOutput);
+
+        Photo photo = new Photo();
+        photo.setPostId(post.getId());
+        photo.setPhotoUri(fileOutput);
+        photoService.save(photo);
 
         return true;
     }

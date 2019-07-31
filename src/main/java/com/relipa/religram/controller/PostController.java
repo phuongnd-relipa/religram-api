@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.springframework.http.ResponseEntity.badRequest;
 import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
@@ -45,8 +46,12 @@ public class PostController {
 
     @PostMapping("")
     public ResponseEntity post(@RequestBody @Valid PostRequestBean postRequestBean) {
+        if (postService.createPost(postRequestBean)) {
+            return ok("Successfully");
+        } else {
+            return badRequest().build();
+        }
 
-        return ok("");
     }
 
     @PostMapping("/{postId}/like")
