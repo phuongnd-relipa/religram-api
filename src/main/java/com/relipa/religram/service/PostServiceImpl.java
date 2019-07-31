@@ -105,23 +105,7 @@ public class PostServiceImpl extends AbstractServiceImpl<Post, Long> implements 
         post.setLikeCount(0);
         post.setUserId(postRequestBean.getUserId());
 
-        List<String> hashtagNames = postRequestBean.getHashtags();
-
-        Set<Hashtag> hashtagSet = new HashSet<>();
-        hashtagNames.forEach(hashtagName -> {
-            if (hashtagService.existHashTagByName(hashtagName)) {
-                Hashtag tag = hashtagService.findByHashtag(hashtagName);
-                hashtagSet.add(tag);
-
-            } else {
-                Hashtag tag = new Hashtag();
-                tag.setHashtag(hashtagName);
-
-                hashtagService.save(tag);
-                hashtagSet.add(tag);
-            }
-        });
-
+        Set<Hashtag> hashtagSet = commentService.insertHashtags(postRequestBean.getHashtags());
         post.setHashtags(hashtagSet);
         postRepository.save(post);
 

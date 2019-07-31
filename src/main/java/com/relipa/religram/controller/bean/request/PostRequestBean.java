@@ -13,11 +13,11 @@ public class PostRequestBean {
 
     private Integer userId;
 
-    @NotBlank(message = "{error.notBlank}")
     private String caption;
 
     @ValidImage
     private String image;
+
     private List<String> hashtags;
 
 
