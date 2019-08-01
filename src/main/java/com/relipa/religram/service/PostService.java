@@ -13,6 +13,8 @@ public interface PostService extends AbstractService<Post,Long> {
 
     Integer getTotalPage();
 
+    Integer countPostByUserId(Integer userId);
+
     boolean createPost(PostRequestBean postRequestBean);
 
 }

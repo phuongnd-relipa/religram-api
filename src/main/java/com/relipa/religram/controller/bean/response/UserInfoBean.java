@@ -8,6 +8,10 @@ public class UserInfoBean extends AbstractBean {
     private String email;
     private String avatar;
 
+    private Integer postCount;
+    private Integer followerCount;
+    private Integer followingCount;
+
     public String getUsername() {
         return username;
     }
@@ -38,5 +42,29 @@ public class UserInfoBean extends AbstractBean {
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public Integer getPostCount() {
+        return postCount;
+    }
+
+    public void setPostCount(Integer postCount) {
+        this.postCount = postCount;
+    }
+
+    public Integer getFollowerCount() {
+        return followerCount;
+    }
+
+    public void setFollowerCount(Integer followerCount) {
+        this.followerCount = followerCount;
+    }
+
+    public Integer getFollowingCount() {
+        return followingCount;
+    }
+
+    public void setFollowingCount(Integer followingCount) {
+        this.followingCount = followingCount;
     }
 }

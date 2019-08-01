@@ -95,6 +95,12 @@ public class PostServiceImpl extends AbstractServiceImpl<Post, Long> implements 
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Integer countPostByUserId(Integer userId) {
+        return postRepository.countByUserId(userId);
+    }
+
+    @Override
     @Transactional
     public boolean createPost(PostRequestBean postRequestBean) {
 

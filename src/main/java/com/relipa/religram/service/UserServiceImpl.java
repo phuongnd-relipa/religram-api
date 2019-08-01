@@ -23,6 +23,9 @@ public class UserServiceImpl extends AbstractServiceImpl<User, Long> implements 
     private final UserRepository userRepository;
 
     @Autowired
+    private PostService postService;
+
+    @Autowired
     private MessageSource messageSource;
 
     @Autowired
@@ -47,6 +50,10 @@ public class UserServiceImpl extends AbstractServiceImpl<User, Long> implements 
         UserInfoBean userInfoBean = new UserInfoBean();
         BeanUtils.copyProperties(user, userInfoBean);
         userInfoBean.setId(user.getId());
+
+        userInfoBean.setPostCount(postService.countPostByUserId(userId.intValue()));
+
+        // TODO: add count of follower and following
 
         return userInfoBean;
     }
