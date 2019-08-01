@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2019. Relipa Software - 株式会社レリパ
+ */
+
 package com.relipa.religram.exceptionhandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2019. Relipa Software - 株式会社レリパ
+ */
+
 package com.relipa.religram.validator;
 
 import com.relipa.religram.validator.UserValidator;
