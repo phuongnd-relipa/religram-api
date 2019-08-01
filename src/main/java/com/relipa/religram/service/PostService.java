@@ -16,9 +16,13 @@ public interface PostService extends AbstractService<Post,Long> {
 
     List<PostBean> getAllPostByPage(Integer page, UserDetails userDetails);
 
+    List<PostBean> getPostByUserid(Integer page, Integer userId);
+
     PostBean getPostDetail(Integer postId, UserDetails userDetails) throws NotFoundException;
 
     Integer getTotalPage();
+
+    Integer getTotalPageByUserId(Integer userId);
 
     Integer countPostByUserId(Integer userId);
 
