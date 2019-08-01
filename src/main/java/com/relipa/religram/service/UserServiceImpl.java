@@ -11,7 +11,6 @@ import com.relipa.religram.repository.UserRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
-import org.springframework.core.env.Environment;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -58,6 +57,8 @@ public class UserServiceImpl extends AbstractServiceImpl<User, Long> implements 
         userInfoBean.setPostCount(postService.countPostByUserId(userId.intValue()));
 
         // TODO: add count of follower and following
+        userInfoBean.setFollowerCount(0);
+        userInfoBean.setFollowingCount(0);
 
         return userInfoBean;
     }

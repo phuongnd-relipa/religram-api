@@ -34,7 +34,8 @@ import java.util.Set;
 public class PostServiceImpl extends AbstractServiceImpl<Post, Long> implements PostService {
 
     private static final Logger LOG = LoggerFactory.getLogger(PostServiceImpl.class);
-    private final static int POST_PER_PAGE = 5;
+    private final static int POSTS_PER_PAGE = 5;
+    private final static int POSTS_OF_USER_PER_PAGE = 9;
 
     @Inject
     private PostRepository postRepository;
@@ -56,7 +57,7 @@ public class PostServiceImpl extends AbstractServiceImpl<Post, Long> implements 
     @Override
     @Transactional(readOnly = true)
     public List<PostBean> getAllPostByPage(Integer page, UserDetails userDetails) {
-        List<Post> postList = postRepository.getPagePost(POST_PER_PAGE, (page - 1) * POST_PER_PAGE);
+        List<Post> postList = postRepository.getPagePost(POSTS_PER_PAGE, (page - 1) * POSTS_PER_PAGE);
         UserInfoBean currentUser = userService.findUserByUserName(userDetails.getUsername());
 
         List<PostBean> posts = new ArrayList<>();
@@ -69,6 +70,27 @@ public class PostServiceImpl extends AbstractServiceImpl<Post, Long> implements 
             posts.add(postBean);
         });
         return posts;
+    }
+
+    @Override
+    public List<PostBean> getPostByUserid(Integer userId, Integer page) {
+
+        List<Post> posts = postRepository.getPostsByUserId((long) userId, POSTS_OF_USER_PER_PAGE, (page - 1) * POSTS_OF_USER_PER_PAGE);
+        List<PostBean> postBeans = new ArrayList<>();
+
+        posts.forEach(post -> {
+            PostBean postBean = new PostBean();
+            BeanUtils.copyProperties(post, postBean);
+            postBean.setId(post.getId());
+
+            List<PhotoBean> photos = photoService.getPhotosByPostId(post.getId());
+            postBean.setPhotos(photos.toArray(new PhotoBean[photos.size()]));
+
+            postBeans.add(postBean);
+
+        });
+
+        return postBeans;
     }
 
     @Override
@@ -85,9 +107,17 @@ public class PostServiceImpl extends AbstractServiceImpl<Post, Long> implements 
     @Override
     @Transactional(readOnly = true)
     public Integer getTotalPage() {
-        long totalPost = postRepository.count();
-        return (int) totalPost / POST_PER_PAGE + 1;
+        Long totalPost = postRepository.count();
 
+        return countPage(totalPost, POSTS_PER_PAGE);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Integer getTotalPageByUserId(Integer userId) {
+        Long totalPost = (long) postRepository.countByUserId(userId);
+
+        return countPage(totalPost, POSTS_OF_USER_PER_PAGE);
     }
 
     @Override
@@ -146,5 +176,16 @@ public class PostServiceImpl extends AbstractServiceImpl<Post, Long> implements 
         postBean.setIsLiked((like == null) ? false : true);
 
         return postBean;
+    }
+
+    private Integer countPage(Long totalPost, Integer postPerPage) {
+        Integer totalPage;
+
+        if (totalPost.intValue() % postPerPage > 0) {
+            totalPage = totalPost.intValue() / postPerPage + 1;
+        } else {
+            totalPage = totalPost.intValue() / postPerPage;
+        }
+        return totalPage;
     }
 }

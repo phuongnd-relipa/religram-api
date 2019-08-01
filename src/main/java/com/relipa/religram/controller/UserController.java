@@ -4,13 +4,19 @@
 
 package com.relipa.religram.controller;
 
+import com.relipa.religram.controller.bean.response.PostBean;
 import com.relipa.religram.controller.bean.response.UserInfoBean;
+import com.relipa.religram.service.PostService;
 import com.relipa.religram.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -20,6 +26,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private PostService postService;
 
     @GetMapping("/{userId}")
     public ResponseEntity getUserInfo(@PathVariable Integer userId) {
@@ -36,7 +45,14 @@ public class UserController {
 
     @GetMapping("/{userId}/posts")
     public ResponseEntity getUserInfo(@PathVariable Integer userId, @RequestParam Integer page) {
-        return  ok("Successfully");
+        List<PostBean> postBeans = postService.getPostByUserid(userId, page);
+        Integer totalPage = postService.getTotalPageByUserId(userId);
+
+        Map<Object, Object> model = new HashMap<>();
+        model.put("posts", postBeans);
+        model.put("totalPage", totalPage);
+
+        return ok(model);
     }
 
 }
