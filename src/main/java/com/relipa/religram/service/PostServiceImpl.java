@@ -57,20 +57,7 @@ public class PostServiceImpl extends AbstractServiceImpl<Post, Long> implements 
 
         List<PostBean> posts = new ArrayList<>();
         postList.forEach(post -> {
-            PostBean postBean = new PostBean();
-            BeanUtils.copyProperties(post, postBean);
-            postBean.setId(post.getId());
-
-            User user = new User();
-            try {
-                user = userService.findById((long) post.getUserId());
-            } catch (NotFoundException e) {
-                LOG.error(e.getMessage(), e);
-            }
-            UserInfoBean userInfoBean = new UserInfoBean();
-            BeanUtils.copyProperties(user, userInfoBean);
-            userInfoBean.setId(user.getId());
-            postBean.setUser(userInfoBean);
+            PostBean postBean = getPostBean(post, currentUser);
 
             List<CommentBean> comments =commentService.get3Comments(post.getId());
             postBean.setComments(comments.toArray(new CommentBean[comments.size()]));
@@ -78,12 +65,20 @@ public class PostServiceImpl extends AbstractServiceImpl<Post, Long> implements 
             List<PhotoBean> photos = photoService.getPhotosByPostId(post.getId());
             postBean.setPhotos(photos.toArray(new PhotoBean[photos.size()]));
 
-            LikeBean like = likeService.getLikeByPostIdAndUserId(post.getId(), currentUser.getId());
-            postBean.setIsLiked((like == null) ? false : true);
-
             posts.add(postBean);
         });
         return posts;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PostBean getPostDetail(Integer postId, UserDetails userDetails) throws NotFoundException {
+        Post post = this.findById((long) postId);
+        UserInfoBean currentUser = userService.findUserByUserName(userDetails.getUsername());
+
+        PostBean postBean = getPostBean(post, currentUser);
+
+        return postBean;
     }
 
     @Override
@@ -125,5 +120,27 @@ public class PostServiceImpl extends AbstractServiceImpl<Post, Long> implements 
         photoService.save(photo);
 
         return true;
+    }
+
+    private PostBean getPostBean(Post post, UserInfoBean currentUser) {
+        PostBean postBean = new PostBean();
+        BeanUtils.copyProperties(post, postBean);
+        postBean.setId(post.getId());
+
+        User user = new User();
+        try {
+            user = userService.findById((long) post.getUserId());
+        } catch (NotFoundException e) {
+            LOG.error(e.getMessage(), e);
+        }
+        UserInfoBean userInfoBean = new UserInfoBean();
+        BeanUtils.copyProperties(user, userInfoBean);
+        userInfoBean.setId(user.getId());
+        postBean.setUser(userInfoBean);
+
+        LikeBean like = likeService.getLikeByPostIdAndUserId(post.getId(), currentUser.getId());
+        postBean.setIsLiked((like == null) ? false : true);
+
+        return postBean;
     }
 }

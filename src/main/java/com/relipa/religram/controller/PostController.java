@@ -9,6 +9,7 @@ import com.relipa.religram.controller.bean.response.PostBean;
 import com.relipa.religram.service.CommentService;
 import com.relipa.religram.service.LikeService;
 import com.relipa.religram.service.PostService;
+import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -52,6 +53,12 @@ public class PostController {
             return badRequest().build();
         }
 
+    }
+
+    @GetMapping("/{postId}")
+    public ResponseEntity getPostDetail(@PathVariable Integer postId, @AuthenticationPrincipal UserDetails userDetails) throws NotFoundException {
+        PostBean postBean = postService.getPostDetail(postId, userDetails);
+        return ok(postBean);
     }
 
     @PostMapping("/{postId}/like")
