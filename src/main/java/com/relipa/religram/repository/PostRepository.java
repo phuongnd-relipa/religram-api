@@ -17,6 +17,6 @@ public interface PostRepository extends CrudRepository<Post, Long> {
 
     Integer countByUserId(Integer userId);
 
-    @Query(value = "select * from posts limit :limit offset :offset order by created_at desc", nativeQuery = true)
+    @Query(value = "select * from posts order by created_at desc limit :limit offset :offset", nativeQuery = true)
     List<Post> getPagePost(@Param("limit") Integer limit, @Param("offset") Integer offset);
 }
