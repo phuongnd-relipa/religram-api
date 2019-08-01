@@ -12,9 +12,11 @@ import java.util.List;
 @Repository
 public interface PostRepository extends CrudRepository<Post, Long> {
 
-    @Query(value = "select * from posts where user_id = :id", nativeQuery = true)
+    @Query(value = "select * from posts where user_id = :id order by created_at desc", nativeQuery = true)
     List<Post> getPostsByUserId(@Param("id") Long id);
 
-    @Query(value = "select * from posts limit :limit offset :offset", nativeQuery = true)
+    Integer countByUserId(Integer userId);
+
+    @Query(value = "select * from posts limit :limit offset :offset order by created_at desc", nativeQuery = true)
     List<Post> getPagePost(@Param("limit") Integer limit, @Param("offset") Integer offset);
 }
