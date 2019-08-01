@@ -62,9 +62,6 @@ public class PostServiceImpl extends AbstractServiceImpl<Post, Long> implements 
             List<CommentBean> comments =commentService.get3Comments(post.getId());
             postBean.setComments(comments.toArray(new CommentBean[comments.size()]));
 
-            List<PhotoBean> photos = photoService.getPhotosByPostId(post.getId());
-            postBean.setPhotos(photos.toArray(new PhotoBean[photos.size()]));
-
             posts.add(postBean);
         });
         return posts;
@@ -137,6 +134,9 @@ public class PostServiceImpl extends AbstractServiceImpl<Post, Long> implements 
         BeanUtils.copyProperties(user, userInfoBean);
         userInfoBean.setId(user.getId());
         postBean.setUser(userInfoBean);
+
+        List<PhotoBean> photos = photoService.getPhotosByPostId(post.getId());
+        postBean.setPhotos(photos.toArray(new PhotoBean[photos.size()]));
 
         LikeBean like = likeService.getLikeByPostIdAndUserId(post.getId(), currentUser.getId());
         postBean.setIsLiked((like == null) ? false : true);
