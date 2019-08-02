@@ -12,6 +12,8 @@ public interface LikeService extends AbstractService<Like, Long> {
 
     LikeBean getLikeByPostIdAndUserId(Long postId, Long userId);
 
+    Integer countLikeByUserIdAndPostId(Long userId, Long postId);
+
     LikeStatusBean likePost(Long postId, Long userId);
     LikeStatusBean unlikePost(LikeBean likeBean);
 }

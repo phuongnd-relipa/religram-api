@@ -69,9 +69,10 @@ public class PostController {
     public ResponseEntity like(@PathVariable Integer postId, @RequestBody LikeBean likeBean) {
 
         LikeBean like = likeService.getLikeByPostIdAndUserId((long) postId, likeBean.getUserId());
+        Integer likeCount = likeService.countLikeByUserIdAndPostId(likeBean.getUserId(), (long) postId);
         LikeStatusBean likeStatusBean;
 
-        if (like != null) {
+        if (likeCount > 0) {
             likeBean.setId(like.getId());
             likeBean.setPostId((long) postId);
             likeStatusBean = likeService.unlikePost(likeBean);
