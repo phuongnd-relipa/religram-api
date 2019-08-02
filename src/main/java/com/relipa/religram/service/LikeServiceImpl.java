@@ -42,6 +42,12 @@ public class LikeServiceImpl extends AbstractServiceImpl<Like, Long> implements 
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Integer countLikeByUserIdAndPostId(Long userId, Long postId) {
+        return likeRepository.countByUserIdAndPostId(userId, postId);
+    }
+
+    @Override
     @Transactional
     public LikeStatusBean likePost(Long postId, Long userId) {
         Like like = Like.LikeBuilder.builder()
