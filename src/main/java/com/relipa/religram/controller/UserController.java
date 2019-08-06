@@ -4,6 +4,8 @@
 
 package com.relipa.religram.controller;
 
+import com.relipa.religram.controller.bean.request.UpdatedUserBean;
+import com.relipa.religram.controller.bean.request.UserSignupBean;
 import com.relipa.religram.controller.bean.response.PostBean;
 import com.relipa.religram.controller.bean.response.UserInfoBean;
 import com.relipa.religram.service.PostService;
@@ -14,6 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +42,8 @@ public class UserController {
     }
 
     @PutMapping("")
-    public ResponseEntity updateUserInfo(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity updateUserInfo(@RequestBody @Valid UpdatedUserBean userInfoBean, @AuthenticationPrincipal UserDetails userDetails) {
+        userService.updateUserInfo(userInfoBean, userDetails);
         return  ok("Successfully");
     }
 

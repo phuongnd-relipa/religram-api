@@ -4,6 +4,7 @@
 
 package com.relipa.religram.controller;
 
+import com.relipa.religram.constant.Constant;
 import com.relipa.religram.util.security.jwt.JwtTokenProvider;
 import com.relipa.religram.controller.bean.request.UserSignupBean;
 import com.relipa.religram.controller.bean.response.UserInfoBean;
@@ -35,8 +36,6 @@ import static org.springframework.http.ResponseEntity.*;
 @RequestMapping("/v1/auth")
 public class AuthController {
 
-    private static final String EMAIL_PATTERN = "^([_a-zA-Z0-9-]+(\\.[_a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)*(\\.[a-zA-Z]{2,6}))?$";
-
     @Autowired
     AuthenticationManager authenticationManager;
 
@@ -58,7 +57,7 @@ public class AuthController {
         try {
             String username = data.getUsername();
 
-            if (username.matches(EMAIL_PATTERN)) {
+            if (username.matches(Constant.EMAIL_PATTERN)) {
                 username = this.userRepository.findByEmail(username).orElseThrow(() -> new BadCredentialsException("Invalid username/password supplied")).getUsername();
             }
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, data.getPassword()));

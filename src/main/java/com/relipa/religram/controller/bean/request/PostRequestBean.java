@@ -16,6 +16,7 @@ public class PostRequestBean {
     private String caption;
 
     @ValidImage
+    @NotBlank
     private String image;
 
     private List<String> hashtags;
