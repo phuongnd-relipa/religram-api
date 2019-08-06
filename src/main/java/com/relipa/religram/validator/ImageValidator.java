@@ -24,6 +24,10 @@ public class ImageValidator implements ConstraintValidator<ValidImage, String> {
     }
 
     private boolean validateUserName(final String imageString) {
+        if (imageString == null || imageString.isEmpty()) {
+            return true;
+        }
+
         Pattern pattern = Pattern.compile(Constant.IMAGE_BASE64_PATTERN);
         Matcher matcher = pattern.matcher(imageString);
         return matcher.matches();

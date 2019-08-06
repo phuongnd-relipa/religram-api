@@ -16,7 +16,7 @@
 # Religram
 
 
-![](https://travis-ci.org/relipasoft/relibnb.svg?branch=master)
+![](https://api.travis-ci.com/relipasoft/religram-api.svg?branch=master)
 
 
 ## Vision
@@ -26,10 +26,13 @@
 ## Overview
 - This project is a clone of Instagram web version
 
-
-## Demo
-
 ## Installation 
+- Run `docker-compose build`
+- Run `docker-compose up -d`
+
+## Documentation
+[API-document](https://religram.relipa-test.online/api-doc)
+
 
 ## Tech Stack
 - Java
