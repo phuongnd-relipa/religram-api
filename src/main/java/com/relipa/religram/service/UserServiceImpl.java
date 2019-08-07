@@ -4,12 +4,14 @@
 
 package com.relipa.religram.service;
 
-import com.relipa.religram.controller.bean.request.UpdatedUserBean;
-import com.relipa.religram.controller.bean.request.UserSignupBean;
+import com.relipa.religram.controller.bean.request.UpdateUserBean;
+import com.relipa.religram.controller.bean.response.UpdatedUserBean;
 import com.relipa.religram.controller.bean.response.UserInfoBean;
 import com.relipa.religram.entity.User;
 import com.relipa.religram.exceptionhandler.UserAlreadyExistException;
 import com.relipa.religram.repository.UserRepository;
+import com.relipa.religram.util.ImageUtils;
+import com.relipa.religram.util.security.jwt.JwtTokenProvider;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -33,6 +35,9 @@ public class UserServiceImpl extends AbstractServiceImpl<User, Long> implements 
 
     @Autowired
     private MessageSource messageSource;
+
+    @Autowired
+    JwtTokenProvider jwtTokenProvider;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository) {
@@ -68,14 +73,29 @@ public class UserServiceImpl extends AbstractServiceImpl<User, Long> implements 
 
     @Override
     @Transactional
-    public boolean updateUserInfo(UpdatedUserBean userInfoBean, UserDetails userDetails) {
+    public UpdatedUserBean updateUserInfo(UpdateUserBean userInfoBean, UserDetails userDetails) {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("An error occured!"));
 
-        user.setUsername(userInfoBean.getUsername());
-        user.setFullName(userInfoBean.getFullname());
+        // Save image
+        String fileOutput = ImageUtils.getImageFileName(userInfoBean.getAvatar());
+        ImageUtils.decodeToImage(userInfoBean.getAvatar(), fileOutput);
 
+        user.setUsername(userInfoBean.getUsername());
+        user.setFullname(userInfoBean.getFullname());
+        user.setAvatar(fileOutput);
         userRepository.save(user);
-        return false;
+
+        UserInfoBean updatedUserInfo = new UserInfoBean();
+        BeanUtils.copyProperties(user, updatedUserInfo);
+        updatedUserInfo.setId(user.getId());
+
+        String token = jwtTokenProvider.createToken(user.getUsername(), user.getRoles());
+
+        UpdatedUserBean updatedUserBean = new UpdatedUserBean();
+        updatedUserBean.setUser(updatedUserInfo);
+        updatedUserBean.setToken(token);
+
+        return updatedUserBean;
     }
 
     @Override
