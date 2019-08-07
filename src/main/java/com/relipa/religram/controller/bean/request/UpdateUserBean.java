@@ -10,7 +10,7 @@ import com.relipa.religram.validator.ValidUserName;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-public class UpdatedUserBean {
+public class UpdateUserBean {
 
     @NotBlank(message = "{error.notBlank}")
     @Size(max = 32, message = "error.maxlength}")

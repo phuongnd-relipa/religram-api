@@ -28,7 +28,7 @@ public class User extends AbstractAuditableEntity<Long> implements UserDetails {
     private String password;
 
     @Column(name = "fullname", nullable = false)
-    private String fullName;
+    private String fullname;
 
     @Column(name = "email", nullable = false)
     private String email;
@@ -82,12 +82,12 @@ public class User extends AbstractAuditableEntity<Long> implements UserDetails {
         this.password = password;
     }
 
-    public String getFullName() {
-        return fullName;
+    public String getFullname() {
+        return fullname;
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public void setFullname(String fullname) {
+        this.fullname = fullname;
     }
 
     public String getEmail() {
@@ -151,8 +151,8 @@ public class User extends AbstractAuditableEntity<Long> implements UserDetails {
             return this;
         }
 
-        public UserBuilder fullName(String fullName) {
-            user.setFullName(fullName);
+        public UserBuilder fullname(String fullname) {
+            user.setFullname(fullname);
             return this;
         }
 

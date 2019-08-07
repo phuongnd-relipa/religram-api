@@ -4,7 +4,8 @@
 
 package com.relipa.religram.service;
 
-import com.relipa.religram.controller.bean.request.UpdatedUserBean;
+import com.relipa.religram.controller.bean.request.UpdateUserBean;
+import com.relipa.religram.controller.bean.response.UpdatedUserBean;
 import com.relipa.religram.controller.bean.response.UserInfoBean;
 import com.relipa.religram.entity.User;
 import com.relipa.religram.exceptionhandler.UserAlreadyExistException;
@@ -18,7 +19,7 @@ public interface UserService extends AbstractService<User, Long> {
 
     UserInfoBean findUserById(Long userId);
 
-    boolean updateUserInfo(UpdatedUserBean userInfoBean, UserDetails userDetails);
+    UpdatedUserBean updateUserInfo(UpdateUserBean userInfoBean, UserDetails userDetails);
 
     void registerNewUserAccount(User user, Locale locale) throws UserAlreadyExistException;
 }

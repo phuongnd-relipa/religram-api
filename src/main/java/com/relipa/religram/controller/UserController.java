@@ -4,9 +4,9 @@
 
 package com.relipa.religram.controller;
 
-import com.relipa.religram.controller.bean.request.UpdatedUserBean;
-import com.relipa.religram.controller.bean.request.UserSignupBean;
+import com.relipa.religram.controller.bean.request.UpdateUserBean;
 import com.relipa.religram.controller.bean.response.PostBean;
+import com.relipa.religram.controller.bean.response.UpdatedUserBean;
 import com.relipa.religram.controller.bean.response.UserInfoBean;
 import com.relipa.religram.service.PostService;
 import com.relipa.religram.service.UserService;
@@ -42,9 +42,9 @@ public class UserController {
     }
 
     @PutMapping("")
-    public ResponseEntity updateUserInfo(@RequestBody @Valid UpdatedUserBean userInfoBean, @AuthenticationPrincipal UserDetails userDetails) {
-        userService.updateUserInfo(userInfoBean, userDetails);
-        return  ok("Successfully");
+    public ResponseEntity updateUserInfo(@RequestBody @Valid UpdateUserBean userInfoBean, @AuthenticationPrincipal UserDetails userDetails) {
+        UpdatedUserBean updatedUserBean = userService.updateUserInfo(userInfoBean, userDetails);
+        return ok(updatedUserBean);
     }
 
     @GetMapping("/{userId}/posts")

@@ -76,7 +76,7 @@ public class AuthController {
                 .password(this.passwordEncoder.encode(userBean.getPassword()))
                 .roles(Arrays.asList("ROLE_USER"))
                 .email(userBean.getEmail())
-                .fullName(userBean.getFullname())
+                .fullname(userBean.getFullname())
                 .build();
 
         this.userService.registerNewUserAccount(user, Locale.ENGLISH);
@@ -93,7 +93,7 @@ public class AuthController {
         UserInfoBean userInfoBean = new UserInfoBean();
         userInfoBean.setId(user.getId());
         userInfoBean.setUsername(user.getUsername());
-        userInfoBean.setFullname(user.getFullName());
+        userInfoBean.setFullname(user.getFullname());
         userInfoBean.setEmail(user.getEmail());
         userInfoBean.setAvatar(user.getAvatar());
 

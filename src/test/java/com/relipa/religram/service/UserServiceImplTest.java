@@ -36,7 +36,7 @@ public class UserServiceImplTest {
         this.user = User.UserBuilder.builder()
                 .id(1L)
                 .email("tetser@relipasoft.com")
-                .fullName("Relipa Software")
+                .fullname("Relipa Software")
                 .username("relipa")
                 .password("123456")
                 .build();
