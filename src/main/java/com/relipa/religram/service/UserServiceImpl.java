@@ -76,6 +76,11 @@ public class UserServiceImpl extends AbstractServiceImpl<User, Long> implements 
     public UpdatedUserBean updateUserInfo(UpdateUserBean userInfoBean, UserDetails userDetails) {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("An error occured!"));
 
+        // Validate unique Username
+        if (userRepository.countByUsernameAndIdNot(userInfoBean.getUsername(), user.getId()) > 0 ) {
+            throw new UserAlreadyExistException(messageSource.getMessage("error.username.existed", null, null, Locale.ENGLISH) + user.getUsername());
+        }
+
         // Save image
         String fileOutput = ImageUtils.getImageFileName(userInfoBean.getAvatar());
         ImageUtils.decodeToImage(userInfoBean.getAvatar(), fileOutput);

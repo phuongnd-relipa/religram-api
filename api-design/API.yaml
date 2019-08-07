@@ -59,9 +59,9 @@ paths:
           schema:
             $ref: '#/definitions/LoginResponse'
         400:
-          description: Validation failed.
+          $ref: '#/responses/ValidationError'
         409:
-          description: User existed.
+          $ref: '#/responses/UserAlreadyExistError'
 
   /auth/verify/{token}:
     get:
@@ -367,6 +367,8 @@ paths:
           description: Successful operation
         401:
           $ref: '#/responses/UnauthorizedError'
+        409:
+          $ref: '#/responses/UserAlreadyExistError'
         default:
           description: Unexpected error
       security:
@@ -413,6 +415,39 @@ responses:
       Authorization:
         description: Bearer {token}
         type: string
+
+  UserAlreadyExistError:
+    description: Xảy ra khi đăng ký/update username đã tồn tại trên hệ thống
+    schema:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          format: int64
+        message:
+          type: string
+  ValidationError:
+    description: Xảy ra khi các thuộc tính gửi lên không đúng validdation.
+    schema:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          format: int64
+        message:
+          type: array
+          xml:
+            name: hashtags
+            wrapped: true
+          items:
+              type: object
+              properties:
+                key:
+                  type: string
+                message:
+                  type: string
+
+
 securityDefinitions:
   religram_auth:
     type: "apiKey"
