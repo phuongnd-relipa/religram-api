@@ -63,6 +63,80 @@ paths:
         409:
           $ref: '#/responses/UserAlreadyExistError'
 
+  /auth/login/facebook:
+    post:
+      tags:
+        - auth
+      summary: Login with Facebook account
+      operationId: 'loginViaFacebook'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          description: Gửi access token từ phía client lên
+          schema:
+            type: object
+            properties:
+              accessToken:
+                type: string
+              refreshToken:
+                type: string
+              expired:
+                type: string
+      responses:
+        200:
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/LoginResponse'
+        301:
+          description: Trường hợp user chưa đăng ký bằng Facebook trả về redirect sang trang đăng ký
+          headers:
+            Location:
+              description: Link redirect sang trang đăng ký user bằng Facebook
+              type: string
+        409:
+          $ref: '#/responses/UserAlreadyExistError'
+        default:
+          description: Unexpected error
+
+  /auth/signup/facebook:
+    post:
+      tags:
+        - auth
+      summary: Sign with Facebook account
+      operationId: 'signupViaFacebook'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          description: Gửi access token từ phía client lên
+          schema:
+            type: object
+            properties:
+              accessToken:
+                type: string
+              refreshToken:
+                type: string
+              expired:
+                type: string
+      responses:
+        200:
+          description: Successful operation
+          schema:
+            type: object
+            description: thông tin lấy được từ Facebook bao gồm username, fullname, email, avatar
+            properties:
+              username:
+                type: string
+              fullname:
+                type: string
+              email:
+                type: string
+              avatar:
+                type: string
+        default:
+          description: Unexpected error
+
   /auth/verify/{token}:
     get:
       tags:
