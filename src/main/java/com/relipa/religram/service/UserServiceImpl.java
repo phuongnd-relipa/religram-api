@@ -4,10 +4,12 @@
 
 package com.relipa.religram.service;
 
+import com.relipa.religram.controller.bean.request.ChangePasswordBean;
 import com.relipa.religram.controller.bean.request.UpdateUserBean;
 import com.relipa.religram.controller.bean.response.UpdatedUserBean;
 import com.relipa.religram.controller.bean.response.UserInfoBean;
 import com.relipa.religram.entity.User;
+import com.relipa.religram.exceptionhandler.PasswordNotMatchException;
 import com.relipa.religram.exceptionhandler.UserAlreadyExistException;
 import com.relipa.religram.repository.UserRepository;
 import com.relipa.religram.util.ImageUtils;
@@ -17,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -38,6 +41,9 @@ public class UserServiceImpl extends AbstractServiceImpl<User, Long> implements 
 
     @Autowired
     JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository) {
@@ -101,6 +107,22 @@ public class UserServiceImpl extends AbstractServiceImpl<User, Long> implements 
         updatedUserBean.setToken(token);
 
         return updatedUserBean;
+    }
+
+    @Override
+    @Transactional
+    public boolean changePassword(ChangePasswordBean changePasswordBean, UserDetails userDetails) {
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("An error occured!"));
+
+        if (passwordEncoder.matches(changePasswordBean.getCurrentPassword(), user.getPassword())) {
+            // Update password
+            user.setPassword(this.passwordEncoder.encode(changePasswordBean.getNewPassword()));
+
+        } else {
+            throw new PasswordNotMatchException("Current password not match or new password invalid");
+        }
+
+        return false;
     }
 
     @Override

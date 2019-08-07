@@ -5,6 +5,7 @@
 package com.relipa.religram.controller;
 
 import com.relipa.religram.constant.Constant;
+import com.relipa.religram.controller.bean.request.ChangePasswordBean;
 import com.relipa.religram.util.security.jwt.JwtTokenProvider;
 import com.relipa.religram.controller.bean.request.UserSignupBean;
 import com.relipa.religram.controller.bean.response.UserInfoBean;
@@ -17,12 +18,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Arrays;
@@ -83,6 +83,12 @@ public class AuthController {
 
         Map<Object, Object> model = this.getTokenAndUser(userBean.getUsername());
         return ok(model);
+    }
+
+    @PutMapping("/changepassword")
+    public ResponseEntity changePassword(@RequestBody @Valid ChangePasswordBean changePasswordBean, @AuthenticationPrincipal UserDetails userDetails) {
+        this.userService.changePassword(changePasswordBean, userDetails);
+        return ok("");
     }
 
     private Map<Object, Object> getTokenAndUser (String username) {

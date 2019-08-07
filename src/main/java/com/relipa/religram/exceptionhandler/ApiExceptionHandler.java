@@ -6,6 +6,7 @@ package com.relipa.religram.exceptionhandler;
 
 import com.relipa.religram.error.ErrorMap;
 import com.relipa.religram.error.ErrorMessage;
+import com.relipa.religram.util.security.jwt.InvalidJwtAuthenticationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
@@ -27,7 +28,7 @@ public class ApiExceptionHandler {
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorMessage handleAllException(Exception ex) {
         // quá trình kiểm soat lỗi diễn ra ở đây
-        return new ErrorMessage(10001, ex.getMessage());
+        return new ErrorMessage(500, ex.getMessage());
     }
 
     /**
@@ -46,7 +47,7 @@ public class ApiExceptionHandler {
             errorMapList.add(new ErrorMap(fieldErrors,messageErrors));
         }
 
-        return new ErrorMessage(10002,errorMapList);
+        return new ErrorMessage(400,errorMapList);
     }
 
     /**
@@ -56,13 +57,19 @@ public class ApiExceptionHandler {
     @ExceptionHandler(UserAlreadyExistException.class)
     public ErrorMessage TodoException(Exception ex) {
 
-        return new ErrorMessage(10003,ex.getMessage());
+        return new ErrorMessage(409,ex.getMessage());
     }
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(BadCredentialsException.class)
     public ErrorMessage handleUnauthrozieException(BadCredentialsException ex) {
-        return new ErrorMessage(10004, ex.getMessage());
+        return new ErrorMessage(401, ex.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(PasswordNotMatchException.class)
+    public ErrorMessage handlePasswordNotMatchException(PasswordNotMatchException ex) {
+        return new ErrorMessage(400, ex.getMessage());
     }
 
 }

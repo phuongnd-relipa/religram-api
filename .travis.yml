@@ -3,4 +3,5 @@ jdk:
   - oraclejdk9
 
 script:
-  - ./mvnw clean install -B
+  - echo "Test CI build"
+#  - ./mvnw clean install -B

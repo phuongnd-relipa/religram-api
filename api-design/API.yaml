@@ -163,14 +163,35 @@ paths:
           description: Successful operation
 
   /auth/changepassword:
-    post:
+    put:
       tags:
         - auth
       summary: Change password
       operationId: 'changePassword'
+      parameters:
+        - name: body
+          in: body
+          description: Đẩy thông tin current password và password mới
+          schema:
+            type: object
+            properties:
+              currentPassword:
+                type: string
+              newPassword:
+                type: string
       responses:
         200:
           description: Successful operation
+        400:
+          description: Current password not match or new password invalid
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+                format: int64
+              message:
+                type: string
         401:
           $ref: '#/responses/UnauthorizedError'
       security:
