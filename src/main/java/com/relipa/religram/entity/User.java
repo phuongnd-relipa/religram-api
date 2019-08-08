@@ -36,6 +36,9 @@ public class User extends AbstractAuditableEntity<Long> implements UserDetails {
     @Column
     private String avatar;
 
+    @OneToOne(mappedBy = "user")
+    private ResetPasswordToken resetPasswordToken;
+
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles = new ArrayList<>();
 
@@ -104,6 +107,14 @@ public class User extends AbstractAuditableEntity<Long> implements UserDetails {
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public ResetPasswordToken getResetPasswordToken() {
+        return resetPasswordToken;
+    }
+
+    public void setResetPasswordToken(ResetPasswordToken resetPasswordToken) {
+        this.resetPasswordToken = resetPasswordToken;
     }
 
     public List<String> getRoles() {

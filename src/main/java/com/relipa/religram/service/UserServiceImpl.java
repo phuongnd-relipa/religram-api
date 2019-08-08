@@ -5,14 +5,18 @@
 package com.relipa.religram.service;
 
 import com.relipa.religram.controller.bean.request.ChangePasswordBean;
+import com.relipa.religram.controller.bean.request.ResetPasswordBean;
 import com.relipa.religram.controller.bean.request.UpdateUserBean;
 import com.relipa.religram.controller.bean.response.UpdatedUserBean;
 import com.relipa.religram.controller.bean.response.UserInfoBean;
+import com.relipa.religram.entity.ResetPasswordToken;
 import com.relipa.religram.entity.User;
 import com.relipa.religram.exceptionhandler.PasswordNotMatchException;
 import com.relipa.religram.exceptionhandler.UserAlreadyExistException;
+import com.relipa.religram.repository.ResetPasswordTokenRepository;
 import com.relipa.religram.repository.UserRepository;
 import com.relipa.religram.util.ImageUtils;
+import com.relipa.religram.util.email.ResetPasswordMail;
 import com.relipa.religram.util.security.jwt.JwtTokenProvider;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +26,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
+import java.sql.Timestamp;
+import java.util.Base64;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -37,13 +44,19 @@ public class UserServiceImpl extends AbstractServiceImpl<User, Long> implements 
     private PostService postService;
 
     @Autowired
+    private ResetPasswordTokenRepository resetPasswordTokenRepository;
+
+    @Autowired
     private MessageSource messageSource;
 
     @Autowired
-    JwtTokenProvider jwtTokenProvider;
+    private JwtTokenProvider jwtTokenProvider;
 
     @Autowired
-    PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private ResetPasswordMail resetPasswordMail;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository) {
@@ -126,6 +139,23 @@ public class UserServiceImpl extends AbstractServiceImpl<User, Long> implements 
     }
 
     @Override
+    @Transactional
+    public boolean resetPassword(ResetPasswordBean resetPasswordBean) {
+        User user = this.getUserFromEmailOrUsername(resetPasswordBean);
+        if (user != null) {
+            try {
+                ResetPasswordToken resetPasswordToken = this.getResetToken(user);
+                resetPasswordMail.sendEmail(user.getUsername(), resetPasswordToken.getResetToken());
+            } catch (MessagingException ex) {
+
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
     public void registerNewUserAccount(User user, Locale locale) throws UserAlreadyExistException {
         if (userExist(user.getUsername())) {
             throw new UserAlreadyExistException(messageSource.getMessage("error.username.existed", null, null, Locale.ENGLISH) + user.getUsername());
@@ -148,5 +178,29 @@ public class UserServiceImpl extends AbstractServiceImpl<User, Long> implements 
 
         Optional<User> user = userRepository.findByEmail(email);
         return user.isPresent();
+    }
+
+    private User getUserFromEmailOrUsername(ResetPasswordBean resetPasswordBean) {
+
+        if (userRepository.findByUsername(resetPasswordBean.getUsername()).isPresent()) {
+            return userRepository.findByUsername(resetPasswordBean.getUsername()).orElseThrow(()
+                    -> new EntityNotFoundException("Not found user"));
+        } else if (userRepository.findByEmail(resetPasswordBean.getUsername()).isPresent()) {
+            return userRepository.findByEmail(resetPasswordBean.getUsername()).orElseThrow(()
+                    -> new EntityNotFoundException("Not found user"));
+        }
+        return null;
+    }
+
+    private ResetPasswordToken getResetToken(User user) {
+        ResetPasswordToken resetPasswordToken = new ResetPasswordToken();
+        resetPasswordToken.setUser(user);
+
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        String originStr = user.getUsername() + timestamp.getTime();
+        resetPasswordToken.setResetToken(Base64.getEncoder().encodeToString(originStr.getBytes()));
+        resetPasswordTokenRepository.save(resetPasswordToken);
+
+        return resetPasswordToken;
     }
 }

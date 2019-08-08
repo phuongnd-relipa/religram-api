@@ -12,7 +12,7 @@ photos
 *.bak
 *.swp
 *~.nib
-local.properties
+application.properties
 .settings/
 .loadpath
 .recommenders

@@ -6,6 +6,8 @@ package com.relipa.religram.controller;
 
 import com.relipa.religram.constant.Constant;
 import com.relipa.religram.controller.bean.request.ChangePasswordBean;
+import com.relipa.religram.controller.bean.request.ResetPasswordBean;
+import com.relipa.religram.error.ErrorMessage;
 import com.relipa.religram.util.security.jwt.JwtTokenProvider;
 import com.relipa.religram.controller.bean.request.UserSignupBean;
 import com.relipa.religram.controller.bean.response.UserInfoBean;
@@ -13,6 +15,7 @@ import com.relipa.religram.entity.User;
 import com.relipa.religram.repository.UserRepository;
 import com.relipa.religram.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -108,5 +111,15 @@ public class AuthController {
         model.put("token", token);
 
         return model;
+    }
+
+    @PostMapping("/resetpassword")
+    public ResponseEntity resetPassword(@RequestBody ResetPasswordBean resetPasswordBean) {
+        if (userService.resetPassword(resetPasswordBean)) {
+            return ok("");
+        } else {
+            return status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorMessage(400, "User/Email not existed."));
+        }
     }
 }
