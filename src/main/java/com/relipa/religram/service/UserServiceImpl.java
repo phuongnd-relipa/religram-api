@@ -193,14 +193,20 @@ public class UserServiceImpl extends AbstractServiceImpl<User, Long> implements 
     }
 
     private ResetPasswordToken getResetToken(User user) {
-        ResetPasswordToken resetPasswordToken = new ResetPasswordToken();
-        resetPasswordToken.setUser(user);
+        if (resetPasswordTokenRepository.findFirstByUser(user).isPresent()) {
+            return resetPasswordTokenRepository.findFirstByUser(user).orElseThrow(()
+                    -> new EntityNotFoundException("Not found Reset Token"));
+        } else {
+            ResetPasswordToken resetPasswordToken = new ResetPasswordToken();
+            resetPasswordToken.setUser(user);
 
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        String originStr = user.getUsername() + timestamp.getTime();
-        resetPasswordToken.setResetToken(Base64.getEncoder().encodeToString(originStr.getBytes()));
-        resetPasswordTokenRepository.save(resetPasswordToken);
+            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+            String originStr = user.getUsername() + timestamp.getTime();
+            resetPasswordToken.setResetToken(Base64.getEncoder().encodeToString(originStr.getBytes()));
+            resetPasswordTokenRepository.save(resetPasswordToken);
 
-        return resetPasswordToken;
+            return resetPasswordToken;
+        }
+
     }
 }
