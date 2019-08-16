@@ -115,11 +115,18 @@ public class AuthController {
 
     @PostMapping("/resetpassword")
     public ResponseEntity resetPassword(@RequestBody ResetPasswordBean resetPasswordBean) {
-        if (userService.resetPassword(resetPasswordBean)) {
+        if (userService.requestResetPassword(resetPasswordBean)) {
             return ok("");
         } else {
             return status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorMessage(400, "User/Email not existed."));
         }
+    }
+
+    @PostMapping("/resetpassword/verify/{token}")
+    public ResponseEntity updatePassword(@PathVariable String token,
+                                         @RequestBody ChangePasswordBean changePasswordBean) {
+        userService.resetPassword(token, changePasswordBean);
+        return ok("");
     }
 }

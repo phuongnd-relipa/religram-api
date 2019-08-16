@@ -14,4 +14,5 @@ public interface ResetPasswordTokenRepository extends CrudRepository<ResetPasswo
 
     Optional<ResetPasswordToken> findFirstByUser(User user);
 
+    Optional<ResetPasswordToken> findByResetToken(String token);
 }

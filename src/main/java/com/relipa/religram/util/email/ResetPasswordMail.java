@@ -4,6 +4,7 @@
 
 package com.relipa.religram.util.email;
 
+import com.relipa.religram.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -20,14 +21,14 @@ public class ResetPasswordMail {
     @Autowired
     private JavaMailSender javaMailSender;
 
-    public void sendEmail(String username, String resetToken) throws MessagingException {
+    public void sendEmail(User user, String resetToken) throws MessagingException {
 
         MimeMessage msg = javaMailSender.createMimeMessage();
 
         // true = multipart message
         MimeMessageHelper helper = new MimeMessageHelper(msg, true);
         helper.setFrom("Religram <no-reply@religram.com>");
-        helper.setTo("hoainv@relipasoft.com");
+        helper.setTo(user.getEmail());
 
         helper.setSubject("Reset Your Password");
 
@@ -55,7 +56,7 @@ public class ResetPasswordMail {
         mailBuilder.append("</style>");
 
         mailBuilder.append("<p>Hi ");
-        mailBuilder.append(username);
+        mailBuilder.append(user.getFullname());
         mailBuilder.append(",</p>");
         mailBuilder.append("<p>We got a request to reset your Religram password.</p><br>");
 

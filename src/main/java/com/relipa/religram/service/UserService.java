@@ -25,7 +25,9 @@ public interface UserService extends AbstractService<User, Long> {
 
     boolean changePassword(ChangePasswordBean changePasswordBean, UserDetails userDetails);
 
-    boolean resetPassword(ResetPasswordBean resetPasswordBean);
+    boolean requestResetPassword(ResetPasswordBean resetPasswordBean);
+
+    boolean resetPassword(String token, ChangePasswordBean changePasswordBean);
 
     void registerNewUserAccount(User user, Locale locale) throws UserAlreadyExistException;
 }

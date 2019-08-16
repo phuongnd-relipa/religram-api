@@ -140,12 +140,12 @@ public class UserServiceImpl extends AbstractServiceImpl<User, Long> implements 
 
     @Override
     @Transactional
-    public boolean resetPassword(ResetPasswordBean resetPasswordBean) {
+    public boolean requestResetPassword(ResetPasswordBean resetPasswordBean) {
         User user = this.getUserFromEmailOrUsername(resetPasswordBean);
         if (user != null) {
             try {
                 ResetPasswordToken resetPasswordToken = this.getResetToken(user);
-                resetPasswordMail.sendEmail(user.getUsername(), resetPasswordToken.getResetToken());
+                resetPasswordMail.sendEmail(user, resetPasswordToken.getResetToken());
             } catch (MessagingException ex) {
 
             }
@@ -153,6 +153,20 @@ public class UserServiceImpl extends AbstractServiceImpl<User, Long> implements 
         } else {
             return false;
         }
+    }
+
+    @Override
+    @Transactional
+    public boolean resetPassword(String token, ChangePasswordBean changePasswordBean) {
+        ResetPasswordToken resetPasswordToken = resetPasswordTokenRepository.findByResetToken(token)
+                                                    .orElseThrow(() -> new EntityNotFoundException("Token is not valid."));
+
+        // Update new password
+        User user = resetPasswordToken.getUser();
+        user.setPassword(passwordEncoder.encode(changePasswordBean.getNewPassword()));
+        userRepository.save(user);
+
+        return true;
     }
 
     @Override
