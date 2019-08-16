@@ -61,7 +61,7 @@ public class ResetPasswordMail {
         mailBuilder.append("<p>We got a request to reset your Religram password.</p><br>");
 
         mailBuilder.append("<div style=\"margin-left: 10px;\">");
-        mailBuilder.append("    <a href=\"https://religram.relipa-test.online/resetpassword/");
+        mailBuilder.append("    <a href=\"https://religram.relipa-test.online/resetpassword?token=");
         mailBuilder.append(resetToken);
         mailBuilder.append("\" class=\"button\">Reset Password</a>");
         mailBuilder.append("</div><br>");
