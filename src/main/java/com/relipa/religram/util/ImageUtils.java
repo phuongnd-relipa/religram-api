@@ -10,10 +10,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
 import java.sql.Timestamp;
 import java.util.Base64;
 
@@ -65,6 +63,22 @@ public class ImageUtils {
         }
 
         return extension;
+    }
+
+    public static void saveImage(String imageUrl, String destinationFile) throws IOException {
+        URL url = new URL(imageUrl);
+        InputStream is = url.openStream();
+        OutputStream os = new FileOutputStream(destinationFile);
+
+        byte[] b = new byte[2048];
+        int length;
+
+        while ((length = is.read(b)) != -1) {
+            os.write(b, 0, length);
+        }
+
+        is.close();
+        os.close();
     }
 
 }

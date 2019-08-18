@@ -8,15 +8,15 @@ import com.relipa.religram.constant.Constant;
 import com.relipa.religram.controller.bean.request.ChangePasswordBean;
 import com.relipa.religram.controller.bean.request.FacebookAuthInfoBean;
 import com.relipa.religram.controller.bean.request.ResetPasswordBean;
-import com.relipa.religram.controller.bean.response.FacebookInfoBean;
-import com.relipa.religram.error.ErrorMessage;
-import com.relipa.religram.service.FacebookService;
-import com.relipa.religram.util.security.jwt.JwtTokenProvider;
 import com.relipa.religram.controller.bean.request.UserSignupBean;
+import com.relipa.religram.controller.bean.response.FacebookInfoBean;
 import com.relipa.religram.controller.bean.response.UserInfoBean;
 import com.relipa.religram.entity.User;
+import com.relipa.religram.error.ErrorMessage;
 import com.relipa.religram.repository.UserRepository;
+import com.relipa.religram.service.FacebookService;
 import com.relipa.religram.service.UserService;
+import com.relipa.religram.util.security.jwt.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +26,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,7 +35,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import static org.springframework.http.ResponseEntity.*;
+import static org.springframework.http.ResponseEntity.ok;
+import static org.springframework.http.ResponseEntity.status;
 
 @RestController
 @RequestMapping("/v1/auth")
@@ -67,7 +67,8 @@ public class AuthController {
             String username = data.getUsername();
 
             if (username.matches(Constant.EMAIL_PATTERN)) {
-                username = this.userRepository.findByEmail(username).orElseThrow(() -> new BadCredentialsException("Invalid username/password supplied")).getUsername();
+                username = this.userRepository.findByEmail(username).orElseThrow(()
+                        -> new BadCredentialsException("Invalid username/password supplied")).getUsername();
             }
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, data.getPassword()));
 
@@ -79,19 +80,28 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity signup(@RequestBody @Valid UserSignupBean userBean) {
-        User user = User.UserBuilder.builder()
-                .username(userBean.getUsername())
-                .password(this.passwordEncoder.encode(userBean.getPassword()))
-                .roles(Arrays.asList("ROLE_USER"))
-                .email(userBean.getEmail())
-                .fullname(userBean.getFullname())
-                .build();
+    public ResponseEntity signup(@RequestBody @Valid UserSignupBean userBean,
+                                 @RequestParam(required = false) Boolean viaFacebook) throws Exception {
 
-        this.userService.registerNewUserAccount(user, Locale.ENGLISH);
+        if (null != viaFacebook && viaFacebook) {
+            UserInfoBean userInfoBean = facebookService.signupFacebook(userBean);
+            Map<Object, Object> model = this.getTokenAndUser(userInfoBean.getUsername());
 
-        Map<Object, Object> model = this.getTokenAndUser(userBean.getUsername());
-        return ok(model);
+            return ok(model);
+        } else {
+            User user = User.UserBuilder.builder()
+                    .username(userBean.getUsername())
+                    .password(this.passwordEncoder.encode(userBean.getPassword()))
+                    .roles(Arrays.asList("ROLE_USER"))
+                    .email(userBean.getEmail())
+                    .fullname(userBean.getFullname())
+                    .build();
+
+            this.userService.registerNewUserAccount(user, Locale.ENGLISH);
+
+            Map<Object, Object> model = this.getTokenAndUser(userBean.getUsername());
+            return ok(model);
+        }
     }
 
     @PostMapping("/signup/facebook")
@@ -102,7 +112,8 @@ public class AuthController {
     }
 
     @PutMapping("/changepassword")
-    public ResponseEntity changePassword(@RequestBody @Valid ChangePasswordBean changePasswordBean, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity changePassword(@RequestBody @Valid ChangePasswordBean changePasswordBean,
+                                         @AuthenticationPrincipal UserDetails userDetails) {
         this.userService.changePassword(changePasswordBean, userDetails);
         return ok("");
     }

@@ -11,5 +11,6 @@ public final class Constant {
     public static final String IMAGE_BASE64_PATTERN = "^data:image\\/(jpg|png|jpeg);base64,([^\\\"]*)$";
 
     public static final String PHOTOS_BASE_PATH = "photos";
+    public static final String DEFAULT_IMAGE_EXT = "png";
 
 }
