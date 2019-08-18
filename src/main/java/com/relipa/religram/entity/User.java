@@ -36,8 +36,12 @@ public class User extends AbstractAuditableEntity<Long> implements UserDetails {
     @Column
     private String avatar;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private ResetPasswordToken resetPasswordToken;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private FacebookUser facebookUser;
+
 
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles = new ArrayList<>();
@@ -115,6 +119,14 @@ public class User extends AbstractAuditableEntity<Long> implements UserDetails {
 
     public void setResetPasswordToken(ResetPasswordToken resetPasswordToken) {
         this.resetPasswordToken = resetPasswordToken;
+    }
+
+    public FacebookUser getFacebookUser() {
+        return facebookUser;
+    }
+
+    public void setFacebookUser(FacebookUser facebookUser) {
+        this.facebookUser = facebookUser;
     }
 
     public List<String> getRoles() {

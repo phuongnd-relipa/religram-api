@@ -17,10 +17,6 @@ import java.util.Set;
 
 @Entity
 @Table(name="posts")
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class Post extends AbstractAuditableEntity<Long> implements Serializable {
 
     @Column(name = "user_id", nullable = false)

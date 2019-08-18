@@ -30,6 +30,10 @@ public class UserSignupBean {
     @Email(message = "{error.email}")
     private String email;
 
+    private String facebookId;
+
+    private String avatar;
+
     public String getUsername() {
         return username;
     }
@@ -60,5 +64,21 @@ public class UserSignupBean {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getFacebookId() {
+        return facebookId;
+    }
+
+    public void setFacebookId(String facebookId) {
+        this.facebookId = facebookId;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 }

@@ -24,12 +24,12 @@ public class ApiExceptionHandler {
     /**
      * Tất cả các Exception không được khai báo sẽ được xử lý tại đây
      */
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorMessage handleAllException(Exception ex) {
-        // quá trình kiểm soat lỗi diễn ra ở đây
-        return new ErrorMessage(500, ex.getMessage());
-    }
+//    @ExceptionHandler(Exception.class)
+//    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
+//    public ErrorMessage handleAllException(Exception ex) {
+//        // quá trình kiểm soat lỗi diễn ra ở đây
+//        return new ErrorMessage(500, ex.getMessage());
+//    }
 
     /**
      * MethodArgumentNotValidException sẽ được xử lý riêng tại đây

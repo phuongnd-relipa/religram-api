@@ -6,8 +6,11 @@ package com.relipa.religram.controller;
 
 import com.relipa.religram.constant.Constant;
 import com.relipa.religram.controller.bean.request.ChangePasswordBean;
+import com.relipa.religram.controller.bean.request.FacebookAuthInfoBean;
 import com.relipa.religram.controller.bean.request.ResetPasswordBean;
+import com.relipa.religram.controller.bean.response.FacebookInfoBean;
 import com.relipa.religram.error.ErrorMessage;
+import com.relipa.religram.service.FacebookService;
 import com.relipa.religram.util.security.jwt.JwtTokenProvider;
 import com.relipa.religram.controller.bean.request.UserSignupBean;
 import com.relipa.religram.controller.bean.response.UserInfoBean;
@@ -54,6 +57,9 @@ public class AuthController {
     @Autowired
     UserService userService;
 
+    @Autowired
+    FacebookService facebookService;
+
     @PostMapping("/login")
     public ResponseEntity signin(@RequestBody AuthenticationRequest data) {
 
@@ -86,6 +92,13 @@ public class AuthController {
 
         Map<Object, Object> model = this.getTokenAndUser(userBean.getUsername());
         return ok(model);
+    }
+
+    @PostMapping("/signup/facebook")
+    public ResponseEntity getFacebookUserInfo(@RequestBody FacebookAuthInfoBean facebookAuthInfoBean) {
+
+        FacebookInfoBean facebookInfoBean = facebookService.getUserFacebook(facebookAuthInfoBean);
+        return ok(facebookInfoBean);
     }
 
     @PutMapping("/changepassword")
