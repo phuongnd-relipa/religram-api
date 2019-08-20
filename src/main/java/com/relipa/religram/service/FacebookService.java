@@ -8,10 +8,12 @@ import com.relipa.religram.controller.bean.request.FacebookAuthInfoBean;
 import com.relipa.religram.controller.bean.request.UserSignupBean;
 import com.relipa.religram.controller.bean.response.FacebookInfoBean;
 import com.relipa.religram.controller.bean.response.UserInfoBean;
+import com.relipa.religram.entity.FacebookUser;
 
-public interface FacebookService {
+public interface FacebookService extends AbstractService<FacebookUser, Long> {
+
+    UserInfoBean findByFacebookId(String facebookId);
 
     FacebookInfoBean getUserFacebook(FacebookAuthInfoBean facebookAuthInfoBean);
 
-    UserInfoBean signupFacebook(UserSignupBean userSignupBean) throws Exception;
 }

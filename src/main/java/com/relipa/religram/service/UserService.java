@@ -4,9 +4,8 @@
 
 package com.relipa.religram.service;
 
-import com.relipa.religram.controller.bean.request.ChangePasswordBean;
-import com.relipa.religram.controller.bean.request.ResetPasswordBean;
-import com.relipa.religram.controller.bean.request.UpdateUserBean;
+import com.relipa.religram.controller.bean.request.*;
+import com.relipa.religram.controller.bean.response.LoginResponseBean;
 import com.relipa.religram.controller.bean.response.UpdatedUserBean;
 import com.relipa.religram.controller.bean.response.UserInfoBean;
 import com.relipa.religram.entity.User;
@@ -16,6 +15,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Locale;
 
 public interface UserService extends AbstractService<User, Long> {
+
+    LoginResponseBean login(AuthenticationRequest data);
+
+    LoginResponseBean signup(UserSignupBean userBean);
 
     UserInfoBean findUserByUserName(String userName);
 
@@ -30,4 +33,9 @@ public interface UserService extends AbstractService<User, Long> {
     boolean resetPassword(String token, ChangePasswordBean changePasswordBean);
 
     void registerNewUserAccount(User user, Locale locale) throws UserAlreadyExistException;
+
+    LoginResponseBean loginFacebook(UserInfoBean UserInfoBean);
+
+    LoginResponseBean signupFacebook(UserSignupBean userSignupBean) throws Exception;
+
 }

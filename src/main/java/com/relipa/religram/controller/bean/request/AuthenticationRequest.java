@@ -2,19 +2,10 @@
  * Copyright (c) 2019. Relipa Software - 株式会社レリパ
  */
 
-package com.relipa.religram.controller;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+package com.relipa.religram.controller.bean.request;
 
 import java.io.Serializable;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class AuthenticationRequest implements Serializable {
     private String username;
     private String password;
