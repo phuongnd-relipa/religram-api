@@ -52,8 +52,6 @@ public class PostServiceImpl extends AbstractServiceImpl<Post, Long> implements 
     @Inject
     private LikeService likeService;
 
-    @Inject HashtagService hashtagService;
-
     @Override
     @Transactional(readOnly = true)
     public List<PostBean> getAllPostByPage(Integer page, UserDetails userDetails) {
@@ -73,24 +71,19 @@ public class PostServiceImpl extends AbstractServiceImpl<Post, Long> implements 
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<PostBean> getPostByUserid(Integer userId, Integer page) {
 
         List<Post> posts = postRepository.getPostsByUserId((long) userId, POSTS_OF_USER_PER_PAGE, (page - 1) * POSTS_OF_USER_PER_PAGE);
-        List<PostBean> postBeans = new ArrayList<>();
+        return getPostBeans(posts);
+    }
 
-        posts.forEach(post -> {
-            PostBean postBean = new PostBean();
-            BeanUtils.copyProperties(post, postBean);
-            postBean.setId(post.getId());
+    @Override
+    @Transactional(readOnly = true)
+    public List<PostBean> getAllPostByHashtag(Integer page, String hashtag) {
 
-            List<PhotoBean> photos = photoService.getPhotosByPostId(post.getId());
-            postBean.setPhotos(photos.toArray(new PhotoBean[photos.size()]));
-
-            postBeans.add(postBean);
-
-        });
-
-        return postBeans;
+        List<Post> posts = postRepository.searchByHashtag(hashtag, POSTS_OF_USER_PER_PAGE, (page - 1) * POSTS_OF_USER_PER_PAGE);
+        return getPostBeans(posts);
     }
 
     @Override
@@ -127,6 +120,13 @@ public class PostServiceImpl extends AbstractServiceImpl<Post, Long> implements 
     }
 
     @Override
+    public Integer countPostByHashtag(String hashtag) {
+        Long totalPost = (long)postRepository.countAllByHashtag(hashtag);
+
+        return countPage(totalPost, POSTS_OF_USER_PER_PAGE);
+    }
+
+    @Override
     @Transactional
     public boolean createPost(PostRequestBean postRequestBean) {
 
@@ -151,6 +151,24 @@ public class PostServiceImpl extends AbstractServiceImpl<Post, Long> implements 
         photoService.save(photo);
 
         return true;
+    }
+
+    private List<PostBean> getPostBeans(List<Post> posts) {
+        List<PostBean> postBeans = new ArrayList<>();
+
+        posts.forEach(post -> {
+            PostBean postBean = new PostBean();
+            BeanUtils.copyProperties(post, postBean);
+            postBean.setId(post.getId());
+
+            List<PhotoBean> photos = photoService.getPhotosByPostId(post.getId());
+            postBean.setPhotos(photos.toArray(new PhotoBean[photos.size()]));
+
+            postBeans.add(postBean);
+
+        });
+
+        return postBeans;
     }
 
     private PostBean getPostBean(Post post, UserInfoBean currentUser) {
