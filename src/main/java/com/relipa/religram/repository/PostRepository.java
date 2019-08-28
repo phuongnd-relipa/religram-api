@@ -23,4 +23,15 @@ public interface PostRepository extends CrudRepository<Post, Long> {
 
     @Query(value = "select * from posts order by created_at desc limit :limit offset :offset", nativeQuery = true)
     List<Post> getPagePost(@Param("limit") Integer limit, @Param("offset") Integer offset);
+
+    @Query(value = "select posts.* from posts, hashtag_post, hashtags where hashtags.hashtag like %:hashtag% " +
+            "and posts.id = hashtag_post.post_id " +
+            "and hashtags.id = hashtag_post.hashtag_id " +
+            "order by created_at desc limit :limit offset :offset", nativeQuery = true)
+    List<Post> searchByHashtag(@Param("hashtag") String hashtag, @Param("limit") Integer limit, @Param("offset") Integer offset);
+
+    @Query(value = "select count(*) from posts, hashtag_post, hashtags where hashtags.hashtag like %:hashtag% " +
+            "and posts.id = hashtag_post.post_id " +
+            "and hashtags.id = hashtag_post.hashtag_id ", nativeQuery = true)
+    Integer countAllByHashtag(@Param("hashtag") String hashtag);
 }

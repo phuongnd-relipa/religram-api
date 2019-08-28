@@ -4,10 +4,7 @@
 
 package com.relipa.religram.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -19,10 +16,10 @@ public class Hashtag  extends AbstractAuditableEntity<Long> implements Serializa
     @Column(unique = true)
     private String hashtag;
 
-    @ManyToMany(mappedBy = "hashtags")
+    @ManyToMany(mappedBy = "hashtags", fetch = FetchType.LAZY)
     private Set<Post> posts = new HashSet<>();
 
-    @ManyToMany(mappedBy = "hashtags")
+    @ManyToMany(mappedBy = "hashtags", fetch = FetchType.LAZY)
     private Set<Comment> comments = new HashSet<>();
 
     public String getHashtag() {

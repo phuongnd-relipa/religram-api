@@ -18,6 +18,8 @@ public interface PostService extends AbstractService<Post,Long> {
 
     List<PostBean> getPostByUserid(Integer page, Integer userId);
 
+    List<PostBean> getAllPostByHashtag(Integer page, String hashtag);
+
     PostBean getPostDetail(Integer postId, UserDetails userDetails) throws NotFoundException;
 
     Integer getTotalPage();
@@ -25,6 +27,8 @@ public interface PostService extends AbstractService<Post,Long> {
     Integer getTotalPageByUserId(Integer userId);
 
     Integer countPostByUserId(Integer userId);
+
+    Integer countPostByHashtag(String hashtag);
 
     boolean createPost(PostRequestBean postRequestBean);
 
