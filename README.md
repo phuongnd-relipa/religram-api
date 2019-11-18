@@ -30,6 +30,11 @@
 - Run `docker-compose build`
 - Run `docker-compose up -d`
 
+## Testing, Test coverage
+- Run Unit Test: `mvn clean test`
+- Run Integration Test: `mvn clean verify -P integration-test`
+- Run All Test: `mvn clean verify -P all-tests`
+
 ## Documentation
 [API-document](https://religram.relipa-test.online/api-doc)
 

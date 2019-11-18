@@ -12,6 +12,7 @@ import com.relipa.religram.entity.User;
 import com.relipa.religram.exceptionhandler.UserAlreadyExistException;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.List;
 import java.util.Locale;
 
 public interface UserService extends AbstractService<User, Long> {
@@ -23,6 +24,10 @@ public interface UserService extends AbstractService<User, Long> {
     UserInfoBean findUserByUserName(String userName);
 
     UserInfoBean findUserById(Long userId);
+
+    List<UserInfoBean> findAllUsers();
+
+    List<UserInfoBean> searchUsersByName(String userName, Integer page);
 
     UpdatedUserBean updateUserInfo(UpdateUserBean userInfoBean, UserDetails userDetails);
 

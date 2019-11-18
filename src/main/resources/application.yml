@@ -1,0 +1,62 @@
+logging:
+    file: app.log
+    level:
+        com:
+            relipa: DEBUG
+        org:
+            springframework:
+                security: DEBUG
+                web: INFO
+#config spring
+spring:
+    data:
+        jpa:
+            repositories:
+                enabled: true
+    jackson:
+        default-property-inclusion: non_empty
+        deserialization:
+            accept-single-value-as-array: true
+            fail-on-ignored-properties: false
+            fail-on-unknown-properties: false
+        mapper:
+            default-view-inclusion: true
+        serialization:
+            indent-output: true
+            write-dates-as-timestamps: false
+    jpa:
+        database-platform: org.hibernate.dialect.MySQL57Dialect
+        generate-ddl: true
+        hibernate:
+            ddl-auto: update
+        open-in-view: true
+        show-sql: true
+    mail:
+        host: smtp.sendgrid.net
+        password: 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
+        port: 587
+        properties:
+            mail:
+                smtp:
+                    auth: true
+                    connectiontimeout: 5000
+                    starttls:
+                        enable: true
+                    timeout: 5000
+                    writetimeout: 5000
+        username: apikey
+    profiles:
+        active: dev
+
+# config security
+facebook:
+    client:
+        clientId: 415825942671592
+        clientSecret: 52d2df26769a392c36f14c13e4267dfa
+        accessTokenUri: https://graph.facebook.com/oauth/access_token
+        userAuthorizationUri: https://www.facebook.com/dialog/oauth
+        tokenName: oauth_token
+        authenticationScheme: query
+        clientAuthenticationScheme: form
+    resource:
+        userInfoUri: https://graph.facebook.com/me

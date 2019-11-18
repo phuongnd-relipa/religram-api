@@ -18,7 +18,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-
     @Autowired
     JwtTokenProvider jwtTokenProvider;
 
@@ -38,10 +37,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/v1/auth/login").permitAll()
-                .antMatchers("/v1/auth/signup").permitAll()
+                .antMatchers("/v1/social/**").permitAll()
+                .antMatchers("/login**", "/error**").permitAll()
+                .antMatchers("/v1/auth/login/**").permitAll()
+                .antMatchers("/v1/auth/signup/**").permitAll()
                 .antMatchers("/v1/auth/facebook").permitAll()
                 .antMatchers("/v1/auth/resetpassword/**").permitAll()
+                .antMatchers("/v2/api-docs", "/configuration/ui", "/swagger-resources/**", "/configuration/**", "/swagger-ui.html", "/webjars/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling()

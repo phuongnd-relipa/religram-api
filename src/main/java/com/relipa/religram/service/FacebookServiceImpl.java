@@ -45,7 +45,7 @@ public class FacebookServiceImpl extends AbstractServiceImpl<FacebookUser, Long>
         Facebook facebook = new FacebookTemplate(facebookAuthInfoBean.getAccessToken());
         String[] fields = {"id", "name", "email"};
 
-        User user = facebook.fetchObject("me", org.springframework.social.facebook.api.User.class, fields);
+        User user = facebook.fetchObject("me", User.class, fields);
         URI uri = URIBuilder.fromUri("https://graph.facebook.com/" + user.getId()
                                     + "/picture?type=large&height=120&width=120&redirect=false").build();
         JsonNode response = facebook.restOperations().getForObject(uri, JsonNode.class);
@@ -53,7 +53,7 @@ public class FacebookServiceImpl extends AbstractServiceImpl<FacebookUser, Long>
 
         FacebookInfoBean facebookInfoBean = new FacebookInfoBean();
         facebookInfoBean.setAvatar(avatarUrl);
-        facebookInfoBean.setEmail(user.getEmail());
+        facebookInfoBean.setEmail(user.getEmail() == null ? "" : user.getEmail());
         facebookInfoBean.setFacebookId(user.getId());
         facebookInfoBean.setFullname(user.getName());
 

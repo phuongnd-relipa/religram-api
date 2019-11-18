@@ -38,13 +38,13 @@ import javax.transaction.Transactional;
 import java.sql.Timestamp;
 import java.util.*;
 
-import static org.springframework.http.ResponseEntity.ok;
-
 @Service
 @Transactional
 public class UserServiceImpl extends AbstractServiceImpl<User, Long> implements UserService {
 
     private final UserRepository userRepository;
+
+    private final static int USERS_PER_PAGE = 10;
 
     @Autowired
     private PostService postService;
@@ -122,6 +122,34 @@ public class UserServiceImpl extends AbstractServiceImpl<User, Long> implements 
     public UserInfoBean findUserById(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("Not found user"));
 
+        UserInfoBean userInfoBean = getUserInfoBean(userId, user);
+
+        return userInfoBean;
+    }
+
+    @Override
+    public List<UserInfoBean> findAllUsers() {
+        Iterable<User> iterable = findAll();
+        List<UserInfoBean> results = new ArrayList<>();
+        iterable.forEach(user -> {
+            UserInfoBean userInfoBean = getUserInfoBean(user.getId(), user);
+            results.add(userInfoBean);
+        });
+        return results;
+    }
+
+    @Override
+    public List<UserInfoBean> searchUsersByName(String userName, Integer page) {
+        Iterable<User> iterable = userRepository.searchUsersByName(userName, USERS_PER_PAGE, (page - 1) * USERS_PER_PAGE);
+        List<UserInfoBean> results = new ArrayList<>();
+        iterable.forEach(user -> {
+            UserInfoBean userInfoBean = getUserInfoBean(user.getId(), user);
+            results.add(userInfoBean);
+        });
+        return results;
+    }
+
+    private UserInfoBean getUserInfoBean(Long userId, User user) {
         UserInfoBean userInfoBean = new UserInfoBean();
         BeanUtils.copyProperties(user, userInfoBean);
         userInfoBean.setId(user.getId());
@@ -131,7 +159,6 @@ public class UserServiceImpl extends AbstractServiceImpl<User, Long> implements 
         // TODO: add count of follower and following
         userInfoBean.setFollowerCount(0);
         userInfoBean.setFollowingCount(0);
-
         return userInfoBean;
     }
 
@@ -141,7 +168,7 @@ public class UserServiceImpl extends AbstractServiceImpl<User, Long> implements 
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("An error occured!"));
 
         // Validate unique Username
-        if (userRepository.countByUsernameAndIdNot(userInfoBean.getUsername(), user.getId()) > 0 ) {
+        if (userRepository.countByUsernameAndIdNot(userInfoBean.getUsername(), user.getId()) > 0) {
             throw new UserAlreadyExistException(messageSource.getMessage("error.username.existed", null, null, Locale.ENGLISH) + user.getUsername());
         }
 
@@ -204,7 +231,7 @@ public class UserServiceImpl extends AbstractServiceImpl<User, Long> implements 
     @Transactional
     public boolean resetPassword(String token, ChangePasswordBean changePasswordBean) {
         ResetPasswordToken resetPasswordToken = resetPasswordTokenRepository.findByResetToken(token)
-                                                    .orElseThrow(() -> new EntityNotFoundException("Token is not valid."));
+                .orElseThrow(() -> new EntityNotFoundException("Token is not valid."));
 
         // Update new password
         User user = resetPasswordToken.getUser();
@@ -264,10 +291,10 @@ public class UserServiceImpl extends AbstractServiceImpl<User, Long> implements 
         return this.getTokenAndUser(userSignupBean.getUsername());
     }
 
-    private LoginResponseBean getTokenAndUser (String username) {
+    private LoginResponseBean getTokenAndUser(String username) {
 
         User user = this.userRepository.findByUsername(username).orElseThrow(() ->
-                            new EntityNotFoundException("User not found"));
+                new EntityNotFoundException("User not found"));
         String token = jwtTokenProvider.createToken(username, user.getRoles());
 
         UserInfoBean userInfoBean = new UserInfoBean();

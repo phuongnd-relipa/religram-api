@@ -10,9 +10,11 @@ import com.relipa.religram.controller.bean.request.PostRequestBean;
 import com.relipa.religram.controller.bean.response.CommentBean;
 import com.relipa.religram.controller.bean.response.LikeStatusBean;
 import com.relipa.religram.controller.bean.response.PostBean;
+import com.relipa.religram.controller.bean.response.SwaggerEmptyModel;
 import com.relipa.religram.service.CommentService;
 import com.relipa.religram.service.LikeService;
 import com.relipa.religram.service.PostService;
+import io.swagger.annotations.*;
 import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +23,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @RequestMapping("/v1/post")
+@Api(tags = {"post"})
 public class PostController {
 
     @Autowired
@@ -43,14 +45,19 @@ public class PostController {
     CommentService commentService;
 
     @GetMapping("")
-    public ResponseEntity list(@RequestParam Integer page, @AuthenticationPrincipal UserDetails userDetails) {
+    @ApiOperation(value = "${post-list.get.value}", notes = "${post-list.get.notes}")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "response.message.200", response = PostBean.class, responseContainer = "List")})
+    public ResponseEntity list(@ApiParam(value = "${post-list.get.param.page}", defaultValue = "1", required = true) @RequestParam Integer page,
+                               @AuthenticationPrincipal UserDetails userDetails) {
 
         List<PostBean> postList = postService.getAllPostByPage(page, userDetails);
         return getResponseEntity(postService.getTotalPage(), postList.toArray(), "posts");
     }
 
     @PostMapping("")
-    public ResponseEntity post(@RequestBody @Valid PostRequestBean postRequestBean) {
+    @ApiOperation(value = "${posts.post.value}", notes = "${posts.post.notes}")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "response.message.200", response = SwaggerEmptyModel.class)})
+    public ResponseEntity post(@ApiParam(value = "${posts.post.param.body}", required = true) @RequestBody @Valid PostRequestBean postRequestBean) {
         if (postService.createPost(postRequestBean)) {
             return ok("Successfully");
         } else {
@@ -60,13 +67,19 @@ public class PostController {
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity getPostDetail(@PathVariable Integer postId, @AuthenticationPrincipal UserDetails userDetails) throws NotFoundException {
+    @ApiOperation(value = "${post-detail.get.value}", notes = "${post-detail.get.notes}")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "response.message.200", response = PostBean.class)})
+    public ResponseEntity getPostDetail(@ApiParam(value = "${post-detail.get.param.postId}", required = true) @PathVariable Integer postId,
+                                        @AuthenticationPrincipal UserDetails userDetails) throws NotFoundException {
         PostBean postBean = postService.getPostDetail(postId, userDetails);
         return ok(postBean);
     }
 
     @PostMapping("/{postId}/like")
-    public ResponseEntity like(@PathVariable Integer postId, @RequestBody LikeBean likeBean) {
+    @ApiOperation(value = "${post-like.post.value}", notes = "${post-like.post.notes}")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "response.message.200", response = LikeStatusBean.class)})
+    public ResponseEntity like(@ApiParam(value = "${post-like.post.param.postId}", required = true) @PathVariable Integer postId,
+                               @RequestBody LikeBean likeBean) {
 
         LikeBean like = likeService.getLikeByPostIdAndUserId((long) postId, likeBean.getUserId());
         Integer likeCount = likeService.countLikeByUserIdAndPostId(likeBean.getUserId(), (long) postId);
@@ -84,7 +97,10 @@ public class PostController {
     }
 
     @GetMapping("{postId}/comment")
-    public ResponseEntity comment(@PathVariable Integer postId, @RequestParam Integer page) {
+    @ApiOperation(value = "${post-comment.get.value}", notes = "${post-comment.get.notes}")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "response.message.200", response = CommentBean.class, responseContainer = "List")})
+    public ResponseEntity comment(@ApiParam(value = "${post-comment.get.param.postId}", required = true) @PathVariable Integer postId,
+                                  @ApiParam(value = "${post-comment.get.param.page}", required = true) @RequestParam Integer page) {
         List<CommentBean> commentBeans = commentService.getCommentsByPostIdAndPageNumber((long) postId, page);
         return getResponseEntity(commentService.getTotalPage((long) postId), commentBeans.toArray(), "comments");
     }
@@ -99,7 +115,10 @@ public class PostController {
     }
 
     @PostMapping("{postId}/comment")
-    public ResponseEntity postComment(@PathVariable Integer postId, @RequestBody CommentRequestBean commentRequest) {
+    @ApiOperation(value = "${post-comment.post.value}", notes = "${post-comment.post.notes}")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "response.message.200", response = CommentBean.class)})
+    public ResponseEntity postComment(@ApiParam(value = "${post-comment.post.param.postId}", required = true) @PathVariable Integer postId,
+                                      @ApiParam(value = "${post-comment.post.param.body}", required = true) @RequestBody CommentRequestBean commentRequest) {
         CommentBean commentBean = commentService.postComment((long) postId, commentRequest);
 
         return ok(commentBean);
