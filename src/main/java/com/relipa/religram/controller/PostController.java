@@ -96,13 +96,32 @@ public class PostController {
         return ok(likeStatusBean);
     }
 
-    @GetMapping("{postId}/comment")
+    /*@GetMapping("{postId}/comment")
     @ApiOperation(value = "${post-comment.get.value}", notes = "${post-comment.get.notes}")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "response.message.200", response = CommentBean.class, responseContainer = "List")})
     public ResponseEntity comment(@ApiParam(value = "${post-comment.get.param.postId}", required = true) @PathVariable Integer postId,
                                   @ApiParam(value = "${post-comment.get.param.page}", required = true) @RequestParam Integer page) {
         List<CommentBean> commentBeans = commentService.getCommentsByPostIdAndPageNumber((long) postId, page);
         return getResponseEntity(commentService.getTotalPage((long) postId), commentBeans.toArray(), "comments");
+    }*/
+
+    @GetMapping("{postId}/comment")
+    @ApiOperation(value = "${post-parent-comment.get.value}", notes = "${post-parent-comment.get.notes}")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "response.message.200", response = CommentBean.class, responseContainer = "List")})
+    public ResponseEntity parentComment(@ApiParam(value = "${post-comment.get.param.postId}", required = true) @PathVariable Integer postId,
+                                        @ApiParam(value = "${post-comment.get.param.page}", defaultValue = "1", required = true) @RequestParam Integer page) {
+        List<CommentBean> commentBeans = commentService.getParentCommentsByPostIdAndPageNumber((long) postId, page);
+        return getResponseEntity(commentService.getParentCommentTotalPage((long) postId), commentBeans.toArray(), "comments");
+    }
+
+    @GetMapping("{postId}/comment/{commentId}")
+    @ApiOperation(value = "${post-sub-comment.get.value}", notes = "${post-sub-comment.get.notes}")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "response.message.200", response = CommentBean.class, responseContainer = "List")})
+    public ResponseEntity subComment(@ApiParam(value = "${post-comment.get.param.postId}", required = true) @PathVariable Integer postId,
+                                     @ApiParam(value = "${post-sub-comment.get.param.id}", required = true) @PathVariable Integer commentId,
+                                     @ApiParam(value = "${post-comment.get.param.page}", defaultValue = "1", required = true) @RequestParam Integer page) {
+        List<CommentBean> commentBeans = commentService.getSubComments((long) postId, (long) commentId, page);
+        return getResponseEntity(commentService.getSubCommentTotalPage((long) postId, (long) commentId), commentBeans.toArray(), "comments");
     }
 
     private ResponseEntity getResponseEntity(Integer totalPage, Object[] objects, String listObjName) {
@@ -120,6 +139,17 @@ public class PostController {
     public ResponseEntity postComment(@ApiParam(value = "${post-comment.post.param.postId}", required = true) @PathVariable Integer postId,
                                       @ApiParam(value = "${post-comment.post.param.body}", required = true) @RequestBody CommentRequestBean commentRequest) {
         CommentBean commentBean = commentService.postComment((long) postId, commentRequest);
+
+        return ok(commentBean);
+    }
+
+    @PostMapping("{postId}/comment/{commentId}")
+    @ApiOperation(value = "${post-sub-comment.post.value}", notes = "${post-sub-comment.post.notes}")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "response.message.200", response = CommentBean.class)})
+    public ResponseEntity postSubComment(@ApiParam(value = "${post-comment.post.param.postId}", required = true) @PathVariable Integer postId,
+                                         @ApiParam(value = "${post-comment.post.param.id}", required = true) @PathVariable Integer commentId,
+                                         @ApiParam(value = "${post-comment.post.param.body}", required = true) @RequestBody CommentRequestBean commentRequest) {
+        CommentBean commentBean = commentService.postSubComment((long) postId, (long) commentId, commentRequest);
 
         return ok(commentBean);
     }

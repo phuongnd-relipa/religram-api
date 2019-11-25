@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CommentRepository extends CrudRepository<Comment, Long> {
@@ -27,4 +28,20 @@ public interface CommentRepository extends CrudRepository<Comment, Long> {
     @Query(value = "select count(*) from comments where post_id = :post_id", nativeQuery = true)
     Integer countCommentsByPostId(@Param("post_id") Long postId);
 
+    @Query(value = "select * from comments where post_id = :post_id and parent_id is null order by created_at desc limit :limit offset :offset", nativeQuery = true)
+    List<Comment> getParentCommentsByPostIdAndPageNumber(@Param("post_id") Long postId, @Param("limit") Integer limit, @Param("offset") Integer offset);
+
+    @Query(value = "select * from comments where post_id = :post_id and parent_id =:comment_id order by created_at desc limit :limit offset :offset", nativeQuery = true)
+    List<Comment> getSubComments(@Param("post_id") Long postId, @Param("comment_id") Long commentId, @Param("limit") Integer limit, @Param("offset") Integer offset);
+
+    @Query(value = "select count(*) from comments where post_id = :post_id and parent_id is null", nativeQuery = true)
+    Integer countParentCommentsByPostId(@Param("post_id") Long postId);
+
+    @Query(value = "select count(*) from comments where post_id = :post_id and parent_id = :comment_id", nativeQuery = true)
+    Integer countSubComments(@Param("post_id") Long postId, @Param("comment_id") Long commentId);
+
+    Optional<Comment> findByIdAndPostId(Long id, Long postId);
+
+    @Query(value = "select * from comments where id = :id and post_id = :post_id", nativeQuery = true)
+    Comment findCommentsByIdAndPostId(@Param("id") Long id, @Param("post_id") Long postId);
 }

@@ -43,4 +43,12 @@ public interface UserService extends AbstractService<User, Long> {
 
     LoginResponseBean signupFacebook(UserSignupBean userSignupBean) throws Exception;
 
+    void followUser(UserDetails userDetails, Long followId);
+
+    void unFollowUser(UserDetails userDetails, Long followId);
+
+    List<UserInfoBean> getFollowers(Long userId);
+
+    List<UserInfoBean> getFollowings(Long userId);
+
 }

@@ -13,4 +13,17 @@ public final class Constant {
     public static final String PHOTOS_BASE_PATH = "photos";
     public static final String DEFAULT_IMAGE_EXT = "png";
 
+    public static final String ACTIVITY_FEED = "ActivityFeed";
+    public static final String USER_FEED = "UserFeed";
+    public static final String LIKE = "like";
+    public static final String FOLLOW = "follow";
+    public static final String COMMENT = "comment";
+    public static final String TAG = "tag";
+    public static final String MENTION = "mention";
+
+    public static final String POST = "post";
+    public static final String USER = "user";
+
+    public static final int MAXIMUM_FEED_PER_USER = 100;
+    public static final int FEED_PER_PAGE = 10;
 }

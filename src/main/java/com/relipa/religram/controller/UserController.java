@@ -5,10 +5,7 @@
 package com.relipa.religram.controller;
 
 import com.relipa.religram.controller.bean.request.UpdateUserBean;
-import com.relipa.religram.controller.bean.response.PostBean;
-import com.relipa.religram.controller.bean.response.UpdatedUserBean;
-import com.relipa.religram.controller.bean.response.UserInfoBean;
-import com.relipa.religram.controller.bean.response.UserPostInfoBean;
+import com.relipa.religram.controller.bean.response.*;
 import com.relipa.religram.error.ErrorMessage;
 import com.relipa.religram.service.PostService;
 import com.relipa.religram.service.UserService;
@@ -82,4 +79,43 @@ public class UserController {
         return ok(model);
     }
 
+    @PostMapping("/{followId}/follow")
+    @ApiOperation(value = "${user-follow.post.value}", notes = "${user-follow.post.notes}")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "response.message.200", response = FollowResponseBean.class)})
+    public ResponseEntity followUser(@ApiParam(value = "${user-follow.post.param.follow}", required = true) @PathVariable Long followId,
+                                     @AuthenticationPrincipal UserDetails userDetails) {
+        userService.followUser(userDetails, followId);
+        return ok(new FollowResponseBean(true));
+    }
+
+    @PostMapping("/{followId}/un-follow")
+    @ApiOperation(value = "${user-un-follow.post.value}", notes = "${user-un-follow.post.notes}")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "response.message.200", response = FollowResponseBean.class)})
+    public ResponseEntity unFollowUser(@ApiParam(value = "${user-un-follow.post.param.follow}", required = true) @PathVariable Long followId,
+                                       @AuthenticationPrincipal UserDetails userDetails) {
+        userService.unFollowUser(userDetails, followId);
+        return ok(new FollowResponseBean(false));
+    }
+
+    @GetMapping("/{userId}/followers")
+    @ApiOperation(value = "${followers.get.value}", notes = "${followers.get.notes}")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "response.message.200", response = FollowerUserInfoBean.class)})
+    public ResponseEntity getFollowers(@ApiParam(value = "${followers.get.param.userId}", required = true) @PathVariable Long userId) throws Exception {
+        List<UserInfoBean> userInfoBeans = userService.getFollowers(userId);
+        FollowerUserInfoBean followerUserInfoBean = new FollowerUserInfoBean();
+        followerUserInfoBean.setCount(userInfoBeans.size());
+        followerUserInfoBean.setUserInfoBeans(userInfoBeans);
+        return ok(followerUserInfoBean);
+    }
+
+    @GetMapping("/{userId}/followings")
+    @ApiOperation(value = "${followings.get.value}", notes = "${followings.get.notes}")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "response.message.200", response = FollowerUserInfoBean.class)})
+    public ResponseEntity getFollowings(@ApiParam(value = "${followings.get.param.userId}", required = true) @PathVariable Long userId) throws Exception {
+        List<UserInfoBean> userInfoBeans = userService.getFollowings(userId);
+        FollowerUserInfoBean followingUserInfoBean = new FollowerUserInfoBean();
+        followingUserInfoBean.setCount(userInfoBeans.size());
+        followingUserInfoBean.setUserInfoBeans(userInfoBeans);
+        return ok(followingUserInfoBean);
+    }
 }

@@ -10,13 +10,15 @@ import com.relipa.religram.controller.bean.response.LoginResponseBean;
 import com.relipa.religram.controller.bean.response.UpdatedUserBean;
 import com.relipa.religram.controller.bean.response.UserInfoBean;
 import com.relipa.religram.entity.FacebookUser;
+import com.relipa.religram.entity.Follow;
 import com.relipa.religram.entity.ResetPasswordToken;
 import com.relipa.religram.entity.User;
-import com.relipa.religram.exceptionhandler.PasswordNotMatchException;
-import com.relipa.religram.exceptionhandler.UserAlreadyExistException;
+import com.relipa.religram.exceptionhandler.*;
 import com.relipa.religram.repository.FacebookUserRepository;
+import com.relipa.religram.repository.FollowRepository;
 import com.relipa.religram.repository.ResetPasswordTokenRepository;
 import com.relipa.religram.repository.UserRepository;
+import com.relipa.religram.util.ActivityFeedUtils;
 import com.relipa.religram.util.ImageUtils;
 import com.relipa.religram.util.email.ResetPasswordMail;
 import com.relipa.religram.util.security.jwt.JwtTokenProvider;
@@ -69,6 +71,12 @@ public class UserServiceImpl extends AbstractServiceImpl<User, Long> implements 
 
     @Autowired
     FacebookUserRepository facebookUserRepository;
+
+    @Autowired
+    FollowRepository followRepository;
+
+    @Autowired
+    ActivityFeedService activityFeedService;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository) {
@@ -155,10 +163,8 @@ public class UserServiceImpl extends AbstractServiceImpl<User, Long> implements 
         userInfoBean.setId(user.getId());
 
         userInfoBean.setPostCount(postService.countPostByUserId(userId.intValue()));
-
-        // TODO: add count of follower and following
-        userInfoBean.setFollowerCount(0);
-        userInfoBean.setFollowingCount(0);
+        userInfoBean.setFollowerCount(followRepository.countTotalFollower(userId));
+        userInfoBean.setFollowingCount(followRepository.countTotalFollowing(userId));
         return userInfoBean;
     }
 
@@ -351,5 +357,69 @@ public class UserServiceImpl extends AbstractServiceImpl<User, Long> implements 
             return resetPasswordToken;
         }
 
+    }
+
+    @Override
+    public void followUser(UserDetails userDetails, Long followId) {
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("An error occured!"));
+        if (user.getId().equals(followId)) {
+            throw new NotAllowFollowException("You can not follow yourself!!!");
+        }
+
+        userRepository.findById(followId).orElseThrow(() -> new EntityNotFoundException("Not found follow user"));
+
+        boolean existFollow = followRepository.existsByUserIdAndFollowingId(user.getId(), followId);
+        if (existFollow) {
+            throw new UserAlreadyFollowException("This userId: '" + user.getId() + "' had already followed this userId: '" + followId + "'");
+        }
+
+        Follow follow = Follow.FollowBuilder.builder()
+                .userId(user.getId())
+                .followingId(followId)
+                .build();
+        followRepository.save(follow);
+
+        // Create new activity feed
+        activityFeedService.createNewFeed(user.getId(), ActivityFeedUtils.TYPE.FOLLOW, followId, Constant.USER, followId);
+    }
+
+    @Override
+    public void unFollowUser(UserDetails userDetails, Long followId) {
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("An error occured!"));
+        if (user.getId().equals(followId)) {
+            throw new NotAllowFollowException("You can not un-follow yourself!!!");
+        }
+
+        userRepository.findById(followId).orElseThrow(() -> new EntityNotFoundException("Not found follow user"));
+
+        Optional<Follow> followOptional = followRepository.findByUserIdAndFollowingId(user.getId(), followId);
+        if (!followOptional.isPresent()) {
+            throw new UserNotFollowException("This userId: '" + user.getId() + "' had not followed this userId: '" + followId + "'");
+        }
+
+        Follow follow = followOptional.get();
+        followRepository.delete(follow);
+    }
+
+    @Override
+    public List<UserInfoBean> getFollowers(Long userId) {
+        List<UserInfoBean> followers = new ArrayList<>();
+        List<Follow> follows = followRepository.findAllFollower(userId);
+        for (Follow follow : follows) {
+            User user = userRepository.findById(follow.getUserId()).orElseThrow(() -> new EntityNotFoundException("Not found user"));
+            followers.add(getUserInfoBean(user.getId(), user));
+        }
+        return followers;
+    }
+
+    @Override
+    public List<UserInfoBean> getFollowings(Long userId) {
+        List<UserInfoBean> followings = new ArrayList<>();
+        List<Follow> follows = followRepository.findAllFollowing(userId);
+        for (Follow follow : follows) {
+            User user = userRepository.findById(follow.getFollowingId()).orElseThrow(() -> new EntityNotFoundException("Not found user"));
+            followings.add(getUserInfoBean(user.getId(), user));
+        }
+        return followings;
     }
 }

@@ -51,6 +51,7 @@ public class SwaggerConfig {
     private static final String POST_PATTERN = "/v1/post.*";
     private static final String HASH_TAG_PATTERN = "/v1/hashtag.*";
     private static final String SEARCH_PATTERN = "/v1/search.*";
+    private static final String ACTIVITY_PATTERN = "/v1/activity-feed.*";
     private static final String AUTH_CHANGE_PASSWORD_PATTERN = "/v1/auth/changepassword.*";
     private static final String AUTH_RESET_PASSWORD_PATTERN = "/v1/auth/resetpassword.*";
     private static final String AUTH_LOGOUT_PATTERN = "/v1/auth/logout.*";
@@ -74,6 +75,7 @@ public class SwaggerConfig {
     private String MESSAGE_TAG_AUTH;
     private String MESSAGE_TAG_HASH_TAG;
     private String MESSAGE_TAG_SEARCH;
+    private String MESSAGE_TAG_ACTIVITY;
 
     private String MESSAGE_RESPONSE_400;
     private String MESSAGE_RESPONSE_401;
@@ -100,6 +102,7 @@ public class SwaggerConfig {
         MESSAGE_TAG_AUTH = messageSource.getMessage("auth.api", null, LOCALE);
         MESSAGE_TAG_HASH_TAG = messageSource.getMessage("hashTag.api", null, LOCALE);
         MESSAGE_TAG_SEARCH = messageSource.getMessage("search.api", null, LOCALE);
+        MESSAGE_TAG_ACTIVITY = messageSource.getMessage("activity.api", null, LOCALE);
 
         MESSAGE_RESPONSE_400 = messageSource.getMessage("response.message.400", null, LOCALE);
         MESSAGE_RESPONSE_401 = messageSource.getMessage("response.message.401", null, LOCALE);
@@ -135,7 +138,8 @@ public class SwaggerConfig {
                         new Tag("post", MESSAGE_TAG_POST),
                         new Tag("auth", MESSAGE_TAG_AUTH),
                         new Tag("hashTag", MESSAGE_TAG_HASH_TAG),
-                        new Tag("search", MESSAGE_TAG_SEARCH)
+                        new Tag("search", MESSAGE_TAG_SEARCH),
+                        new Tag("activity", MESSAGE_TAG_ACTIVITY)
                 )
                 .useDefaultResponseMessages(false)
                 .globalResponseMessage(RequestMethod.GET, responseMessages())
@@ -173,6 +177,7 @@ public class SwaggerConfig {
                         PathSelectors.regex(POST_PATTERN),
                         PathSelectors.regex(HASH_TAG_PATTERN),
                         PathSelectors.regex(SEARCH_PATTERN),
+                        PathSelectors.regex(ACTIVITY_PATTERN),
                         PathSelectors.regex(AUTH_CHANGE_PASSWORD_PATTERN),
                         PathSelectors.regex(AUTH_RESET_PASSWORD_PATTERN),
                         PathSelectors.regex(AUTH_LOGOUT_PATTERN))

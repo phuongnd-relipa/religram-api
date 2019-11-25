@@ -14,6 +14,9 @@ import java.util.Set;
 @Table(name="comments")
 public class Comment extends AbstractAuditableEntity<Long> implements Serializable {
 
+    @Column(name = "parent_id")
+    private Long parentId;
+
     @Column(name = "user_id")
     private Long userId;
 
@@ -26,6 +29,14 @@ public class Comment extends AbstractAuditableEntity<Long> implements Serializab
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "hashtag_comment", joinColumns = @JoinColumn(name = "comment_id"), inverseJoinColumns = @JoinColumn(name = "hashtag_id"))
     private Set<Hashtag> hashtags = new HashSet<>();
+
+    public Long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
+    }
 
     public Long getUserId() {
         return userId;
@@ -65,6 +76,7 @@ public class Comment extends AbstractAuditableEntity<Long> implements Serializab
         private Long id;
         private Long userId;
         private Long postId;
+        private Long parentId;
         private String comment;
 
         private CommentBuilder() {
@@ -76,6 +88,11 @@ public class Comment extends AbstractAuditableEntity<Long> implements Serializab
 
         public CommentBuilder id(Long id) {
             this.id = id;
+            return this;
+        }
+
+        public CommentBuilder parentId(Long parentId) {
+            this.parentId = parentId;
             return this;
         }
 
@@ -107,6 +124,7 @@ public class Comment extends AbstractAuditableEntity<Long> implements Serializab
         public Comment build() {
             Comment comment = new Comment();
             comment.setId(id);
+            comment.setParentId(parentId);
             comment.setUserId(userId);
             comment.setPostId(postId);
             comment.setComment(this.comment);

@@ -14,6 +14,7 @@ import com.relipa.religram.entity.User;
 import com.relipa.religram.repository.CommentRepository;
 import com.relipa.religram.repository.PostRepository;
 import com.relipa.religram.repository.UserRepository;
+import com.relipa.religram.util.ActivityFeedUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -37,7 +38,11 @@ public class CommentServiceImpl extends AbstractServiceImpl<Comment, Long> imple
     @Inject
     private PostRepository postRepository;
 
-    @Inject HashtagService hashtagService;
+    @Inject
+    HashtagService hashtagService;
+
+    @Inject
+    private ActivityFeedService activityFeedService;
 
     @Override
     @Transactional(readOnly = true)
@@ -49,6 +54,25 @@ public class CommentServiceImpl extends AbstractServiceImpl<Comment, Long> imple
         return getCommentBeans(commentBeans, comments);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<CommentBean> getParentCommentsByPostIdAndPageNumber(Long postId, Integer page) {
+        List<CommentBean> commentBeans = new ArrayList<>();
+        List<Comment> comments;
+
+        comments = commentRepository.getParentCommentsByPostIdAndPageNumber(postId, COMMENT_PER_PAGE, (page - 1) * COMMENT_PER_PAGE);
+        return getCommentBeans(commentBeans, comments);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CommentBean> getSubComments(Long postId, Long commentId, Integer page) {
+        List<CommentBean> commentBeans = new ArrayList<>();
+        List<Comment> comments;
+
+        comments = commentRepository.getSubComments(postId, commentId, COMMENT_PER_PAGE, (page - 1) * COMMENT_PER_PAGE);
+        return getCommentBeans(commentBeans, comments);
+    }
 
     @Override
     @Transactional
@@ -56,6 +80,20 @@ public class CommentServiceImpl extends AbstractServiceImpl<Comment, Long> imple
         long totalPost = commentRepository.countCommentsByPostId(postId);
         return (int) totalPost / COMMENT_PER_PAGE + 1;
 
+    }
+
+    @Override
+    @Transactional
+    public Integer getParentCommentTotalPage(Long postId) {
+        long totalPost = commentRepository.countParentCommentsByPostId(postId);
+        return (int) totalPost / COMMENT_PER_PAGE + 1;
+    }
+
+    @Override
+    @Transactional
+    public Integer getSubCommentTotalPage(Long postId, Long commentId) {
+        long totalPost = commentRepository.countSubComments(postId, commentId);
+        return (int) totalPost / COMMENT_PER_PAGE + 1;
     }
 
     @Override
@@ -98,6 +136,47 @@ public class CommentServiceImpl extends AbstractServiceImpl<Comment, Long> imple
 
         CommentBean commentBean = new CommentBean();
         this.getCommentBean(commentBean, comment);
+
+        // Create new activity feed
+        activityFeedService.createNewFeed((long) commentRequestBean.getUserId(), ActivityFeedUtils.TYPE.COMMENT, postId,
+                comment.getComment(), (long) Objects.requireNonNull(post).getUserId());
+
+        return commentBean;
+    }
+
+    @Override
+    @Transactional
+    public CommentBean postSubComment(Long postId, Long commentId, CommentRequestBean commentRequestBean) {
+        Comment existComment = commentRepository.findCommentsByIdAndPostId(commentId, postId);
+        if (existComment == null) {
+            throw new EntityNotFoundException("Not found comment");
+        }
+
+        Set<Hashtag> hashtagSet = insertHashtags(commentRequestBean.getHashtags());
+
+        Comment comment = Comment.CommentBuilder.builder()
+                .postId(postId)
+                .userId((long) commentRequestBean.getUserId())
+                .parentId(commentId)
+                .comment(commentRequestBean.getComment())
+                .build();
+        comment.setHashtags(hashtagSet);
+        comment = commentRepository.save(comment);
+
+        // Update comment count of Post
+        Post post = postRepository.findById(postId).orElseThrow(() -> new EntityNotFoundException("Not found the Post"));
+        if (post != null) {
+            post.setCommentCount(post.getCommentCount() + 1);
+        }
+
+        CommentBean commentBean = new CommentBean();
+        this.getCommentBean(commentBean, comment);
+
+        User user = userRepository.findById(existComment.getUserId()).orElseThrow(() -> new EntityNotFoundException("Not found user"));
+
+        // Create new activity feed
+        activityFeedService.createNewFeed((long) commentRequestBean.getUserId(), ActivityFeedUtils.TYPE.COMMENT, commentId,
+                comment.getComment(), user.getId());
 
         return commentBean;
     }
