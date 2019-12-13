@@ -119,20 +119,15 @@ public class UserServiceImpl extends AbstractServiceImpl<User, Long> implements 
     @Override
     public UserInfoBean findUserByUserName(String userName) {
         User user = userRepository.findByUsername(userName).orElseThrow(() -> new UsernameNotFoundException("An error occured!"));
-        UserInfoBean userInfoBean = new UserInfoBean();
-        BeanUtils.copyProperties(user, userInfoBean);
-        userInfoBean.setId(user.getId());
 
-        return userInfoBean;
+        return getUserInfoBean(user.getId(), user);
     }
 
     @Override
     public UserInfoBean findUserById(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("Not found user"));
 
-        UserInfoBean userInfoBean = getUserInfoBean(userId, user);
-
-        return userInfoBean;
+        return getUserInfoBean(user.getId(), user);
     }
 
     @Override

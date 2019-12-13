@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import springfox.bean.validators.configuration.BeanValidatorPluginsConfiguration;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -52,6 +53,8 @@ public class SwaggerConfig {
     private static final String HASH_TAG_PATTERN = "/v1/hashtag.*";
     private static final String SEARCH_PATTERN = "/v1/search.*";
     private static final String ACTIVITY_PATTERN = "/v1/activity-feed.*";
+    private static final String CHAT_PATTERN = "/v1/chat.*";
+    private static final String UPLOAD_PATTERN = "/v1/upload.*";
     private static final String AUTH_CHANGE_PASSWORD_PATTERN = "/v1/auth/changepassword.*";
     private static final String AUTH_RESET_PASSWORD_PATTERN = "/v1/auth/resetpassword.*";
     private static final String AUTH_LOGOUT_PATTERN = "/v1/auth/logout.*";
@@ -76,6 +79,8 @@ public class SwaggerConfig {
     private String MESSAGE_TAG_HASH_TAG;
     private String MESSAGE_TAG_SEARCH;
     private String MESSAGE_TAG_ACTIVITY;
+    private String MESSAGE_TAG_CHAT;
+    private String MESSAGE_TAG_UPLOAD;
 
     private String MESSAGE_RESPONSE_400;
     private String MESSAGE_RESPONSE_401;
@@ -103,6 +108,8 @@ public class SwaggerConfig {
         MESSAGE_TAG_HASH_TAG = messageSource.getMessage("hashTag.api", null, LOCALE);
         MESSAGE_TAG_SEARCH = messageSource.getMessage("search.api", null, LOCALE);
         MESSAGE_TAG_ACTIVITY = messageSource.getMessage("activity.api", null, LOCALE);
+        MESSAGE_TAG_CHAT = messageSource.getMessage("chat.api", null, LOCALE);
+        MESSAGE_TAG_UPLOAD = messageSource.getMessage("upload.api", null, LOCALE);
 
         MESSAGE_RESPONSE_400 = messageSource.getMessage("response.message.400", null, LOCALE);
         MESSAGE_RESPONSE_401 = messageSource.getMessage("response.message.401", null, LOCALE);
@@ -139,7 +146,9 @@ public class SwaggerConfig {
                         new Tag("auth", MESSAGE_TAG_AUTH),
                         new Tag("hashTag", MESSAGE_TAG_HASH_TAG),
                         new Tag("search", MESSAGE_TAG_SEARCH),
-                        new Tag("activity", MESSAGE_TAG_ACTIVITY)
+                        new Tag("activity", MESSAGE_TAG_ACTIVITY),
+                        new Tag("chat", MESSAGE_TAG_CHAT),
+                        new Tag("upload", MESSAGE_TAG_UPLOAD)
                 )
                 .useDefaultResponseMessages(false)
                 .globalResponseMessage(RequestMethod.GET, responseMessages())
@@ -148,7 +157,7 @@ public class SwaggerConfig {
                 .globalResponseMessage(RequestMethod.PATCH, responseMessages())
                 .globalResponseMessage(RequestMethod.DELETE, responseMessages())
                 .directModelSubstitute(SwaggerEmptyModel.class, Void.class)
-                .ignoredParameterTypes(AuthenticationPrincipal.class)
+                .ignoredParameterTypes(AuthenticationPrincipal.class, RedirectAttributes.class)
                 .produces(new HashSet<>(Arrays.asList("application/json")))
                 .securityContexts(Lists.newArrayList(securityContext()))
                 .securitySchemes(Lists.newArrayList(apiKey()))
@@ -178,6 +187,8 @@ public class SwaggerConfig {
                         PathSelectors.regex(HASH_TAG_PATTERN),
                         PathSelectors.regex(SEARCH_PATTERN),
                         PathSelectors.regex(ACTIVITY_PATTERN),
+                        PathSelectors.regex(CHAT_PATTERN),
+                        PathSelectors.regex(UPLOAD_PATTERN),
                         PathSelectors.regex(AUTH_CHANGE_PASSWORD_PATTERN),
                         PathSelectors.regex(AUTH_RESET_PASSWORD_PATTERN),
                         PathSelectors.regex(AUTH_LOGOUT_PATTERN))

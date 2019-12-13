@@ -1,8 +1,8 @@
 package com.relipa.religram.configuration;
 
-import com.relipa.religram.messages.MessagePublisher;
-import com.relipa.religram.messages.RedisMessagePublisher;
-import com.relipa.religram.messages.RedisMessageSubscriber;
+import com.relipa.religram.messages.redis.MessagePublisher;
+import com.relipa.religram.messages.redis.RedisMessagePublisher;
+import com.relipa.religram.messages.redis.RedisMessageSubscriber;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
@@ -35,7 +35,8 @@ public class RedisConfig {
     RedisMessageListenerContainer redisContainer() {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(jedisConnectionFactory());
-        container.addMessageListener(messageListener(), topic());
+        // Add pub-sub
+        //container.addMessageListener(messageListener(), topic());
         return container;
     }
 

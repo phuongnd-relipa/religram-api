@@ -1,4 +1,4 @@
-package com.relipa.religram.messages;
+package com.relipa.religram.messages.redis;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;

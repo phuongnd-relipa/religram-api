@@ -52,6 +52,11 @@ spring:
         username: apikey
     profiles:
         active: dev
+    servlet:
+        multipart:
+            max-file-size: 20MB
+            max-request-size: 20MB
+            enabled: true
 
 # config security
 facebook:

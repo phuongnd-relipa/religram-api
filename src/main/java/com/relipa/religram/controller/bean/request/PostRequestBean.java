@@ -19,8 +19,9 @@ public class PostRequestBean {
     @NotBlank
     private String image;
 
-    private List<String> hashtags;
+    private String video;
 
+    private List<String> hashtags;
 
     public Integer getUserId() {
         return userId;
@@ -44,6 +45,14 @@ public class PostRequestBean {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public String getVideo() {
+        return video;
+    }
+
+    public void setVideo(String video) {
+        this.video = video;
     }
 
     public List<String> getHashtags() {

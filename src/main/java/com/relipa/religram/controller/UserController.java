@@ -43,8 +43,16 @@ public class UserController {
     @GetMapping("/{userId}")
     @ApiOperation(value = "${user-info.get.value}", notes = "${user-info.get.notes}")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "response.message.200", response = UserInfoBean.class)})
-    public ResponseEntity getUserInfo(@ApiParam(value = "${user-info.get.param.id}", required = true) @PathVariable Integer userId) {
+    public ResponseEntity getUserInfoById(@ApiParam(value = "${user-info.get.param.id}", required = true) @PathVariable Integer userId) {
         UserInfoBean userInfoBean = userService.findUserById((long) userId);
+        return ok(userInfoBean);
+    }
+
+    @GetMapping("/{name}/info")
+    @ApiOperation(value = "${user-name.get.value}", notes = "${user-name.get.notes}")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "response.message.200", response = UserInfoBean.class)})
+    public ResponseEntity getUserInfoByName(@ApiParam(value = "${user-name.get.param.name}", required = true) @PathVariable String name) {
+        UserInfoBean userInfoBean = userService.findUserByUserName(name);
         return ok(userInfoBean);
     }
 

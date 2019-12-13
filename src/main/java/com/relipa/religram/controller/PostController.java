@@ -76,6 +76,7 @@ public class PostController {
     }
 
     @PostMapping("/{postId}/like")
+
     @ApiOperation(value = "${post-like.post.value}", notes = "${post-like.post.notes}")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "response.message.200", response = LikeStatusBean.class)})
     public ResponseEntity like(@ApiParam(value = "${post-like.post.param.postId}", required = true) @PathVariable Integer postId,

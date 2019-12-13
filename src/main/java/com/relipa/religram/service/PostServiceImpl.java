@@ -10,10 +10,7 @@ import com.relipa.religram.controller.bean.response.CommentBean;
 import com.relipa.religram.controller.bean.response.PhotoBean;
 import com.relipa.religram.controller.bean.response.PostBean;
 import com.relipa.religram.controller.bean.response.UserInfoBean;
-import com.relipa.religram.entity.Hashtag;
-import com.relipa.religram.entity.Photo;
-import com.relipa.religram.entity.Post;
-import com.relipa.religram.entity.User;
+import com.relipa.religram.entity.*;
 import com.relipa.religram.repository.PostRepository;
 import com.relipa.religram.util.ImageUtils;
 import javassist.NotFoundException;
@@ -48,6 +45,9 @@ public class PostServiceImpl extends AbstractServiceImpl<Post, Long> implements 
 
     @Inject
     private PhotoService photoService;
+
+    @Inject
+    private VideoService videoService;
 
     @Inject
     private LikeService likeService;
@@ -149,6 +149,13 @@ public class PostServiceImpl extends AbstractServiceImpl<Post, Long> implements 
         photo.setPostId(post.getId());
         photo.setPhotoUri(fileOutput);
         photoService.save(photo);
+
+        if (postRequestBean.getVideo() != null) {
+            Video video = new Video();
+            video.setPostId(post.getId());
+            video.setVideoUri(postRequestBean.getVideo());
+            videoService.save(video);
+        }
 
         return true;
     }

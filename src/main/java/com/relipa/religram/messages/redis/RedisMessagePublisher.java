@@ -1,4 +1,4 @@
-package com.relipa.religram.messages;
+package com.relipa.religram.messages.redis;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
